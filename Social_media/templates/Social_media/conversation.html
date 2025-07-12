@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with {{ other_user.username }} - Social Media</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-2xl font-bold text-purple-600">SocialMedia</div>
+                <div class="flex space-x-4">
+                    <a href="{% url 'home' %}" class="text-gray-600 hover:text-gray-800">Home</a>
+                    <a href="{% url 'messages' %}" class="text-gray-600 hover:text-gray-800">Messages</a>
+                    <a href="{% url 'logout' %}" class="text-gray-600 hover:text-gray-800">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Chat Header -->
+            <div class="bg-purple-600 text-white p-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-purple-600 font-bold">
+                        {{ other_user.username|first|upper }}
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-semibold">{{ other_user.username }}</h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="h-96 overflow-y-auto p-4 space-y-4">
+                {% for message in messages %}
+                <div class="flex {% if message.sender == user %}justify-end{% else %}justify-start{% endif %}">
+                    <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg {% if message.sender == user %}bg-purple-600 text-white{% else %}bg-gray-200 text-gray-800{% endif %}">
+                        <p>{{ message.message }}</p>
+                        <p class="text-xs {% if message.sender == user %}text-purple-200{% else %}text-gray-500{% endif %} mt-1">
+                            {{ message.sent_date|date:"M d, H:i" }}
+                            {% if message.sender == user %}
+                                {% if message.message_seen %}
+                                    <span class="ml-2 text-green-300">&#10003; Seen</span>
+                                {% else %}
+                                    <span class="ml-2 text-yellow-300">&#9203; Unseen</span>
+                                {% endif %}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-gray-500 py-8">
+                    <p>No messages yet. Start the conversation!</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Message Input -->
+            <div class="border-t border-gray-200 p-4">
+                <form method="post" class="flex space-x-3">
+                    {% csrf_token %}
+                    <input 
+                        type="text" 
+                        name="message" 
+                        placeholder="Type your message..." 
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        required
+                    >
+                    <button 
+                        type="submit" 
+                        class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
+                    >
+                        Send
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

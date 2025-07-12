@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Post - Social Media</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-2xl font-bold text-purple-600">SocialMedia</div>
+                <div class="flex space-x-4">
+                    <a href="{% url 'home' %}" class="text-gray-600 hover:text-gray-800">Home</a>
+                    <a href="{% url 'logout' %}" class="text-gray-600 hover:text-gray-800">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-2xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Warning Header -->
+            <div class="bg-red-50 border-b border-red-200 p-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        ⚠️
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-red-800">Delete Post</h1>
+                        <p class="text-red-600">This action cannot be undone</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Post Preview -->
+            <div class="p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Post to be deleted:</h2>
+                
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-6">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            {{ post.user.username|first|upper }}
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ post.user.username }}</h3>
+                            <p class="text-sm text-gray-500">{{ post.post_date|date:"M d, Y H:i" }}</p>
+                        </div>
+                    </div>
+
+                    {% if post.content %}
+                    <p class="text-gray-800 mb-3">{{ post.content }}</p>
+                    {% endif %}
+                    
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="Post image" class="w-full h-32 object-cover rounded-lg mb-3">
+                    {% endif %}
+                    
+                    {% if post.post_caption %}
+                    <p class="text-gray-600 italic text-sm">{{ post.post_caption }}</p>
+                    {% endif %}
+
+                    <div class="mt-3 pt-3 border-t border-gray-200">
+                        <div class="flex items-center space-x-4 text-sm text-gray-600">
+                            <span>❤️ {{ post.like_count }} likes</span>
+                            <span>💬 {{ post.comment_count }} comments</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Message -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-6 h-6 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="font-semibold text-yellow-800">Warning</h3>
+                            <p class="text-yellow-700 mt-1">
+                                Deleting this post will permanently remove it and all associated likes and comments. 
+                                This action cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirmation Form -->
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <div class="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+                        <input type="checkbox" id="confirm-delete" name="confirm_delete" required class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                        <label for="confirm-delete" class="text-sm text-gray-700">
+                            I understand that this action is permanent and cannot be undone
+                        </label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex space-x-4 pt-4">
+                        <button 
+                            type="submit" 
+                            class="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            id="delete-btn"
+                            disabled
+                        >
+                            <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Post
+                        </button>
+                        <a 
+                            href="{% url 'home' %}" 
+                            class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                        >
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+<script>
+  const checkbox = document.getElementById('confirm-delete');
+  const deleteBtn = document.getElementById('delete-btn');
+  if (checkbox && deleteBtn) {
+    checkbox.addEventListener('change', function() {
+      deleteBtn.disabled = !this.checked;
+    });
+  }
+</script>
+</html> 

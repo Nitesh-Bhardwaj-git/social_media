@@ -1,0 +1,143 @@
+{% extends 'Social_media/base.html' %}
+
+{% block title %}Home - Snapzy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    {% if user.is_authenticated %}
+        <!-- Welcome Section -->
+        <div class="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl shadow-xl p-8 mb-8 text-white animate-bounce-in">
+            <div class="flex items-center space-x-4 mb-6">
+                {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s profile image" class="w-16 h-16 rounded-full object-cover shadow-lg">
+                {% else %}
+                    <div class="w-16 h-16 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+                <h1 class="text-3xl font-bold mb-2">Welcome back, {{ user.username }}!</h1>
+            </div>
+            <p class="text-primary-100 text-lg">Share your thoughts and connect with friends</p>
+            <div class="mt-6 flex space-x-4">
+                <a href="{% url 'create_post' %}" class="bg-white text-primary-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Create Post
+                </a>
+                <a href="{% url 'search' %}" class="bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-200 backdrop-blur-sm">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Find People
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <!-- Hero Section for Non-authenticated Users -->
+        <div class="text-center py-16 animate-fade-in">
+            <div class="max-w-3xl mx-auto">
+                <div class="w-24 h-24 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-4xl mx-auto mb-8 shadow-2xl animate-bounce-in">
+                    S
+                </div>
+                <h1 class="text-5xl font-bold text-gray-800 mb-6 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+                    Welcome to Snapzy
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                    Connect, share, and discover with friends. Join Snapzy and start sharing your stories today.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'register' %}" class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        Get Started
+                    </a>
+                    <a href="{% url 'login' %}" class="border-2 border-primary-500 text-primary-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-primary-50 transition-all duration-200">
+                        <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                        </svg>
+                        Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <div class="space-y-6">
+        {% for post in posts %}
+            {% include 'Social_media/post.html' with post=post %}
+        {% empty %}
+        <div class="text-center py-16 bg-white rounded-2xl shadow-lg animate-bounce-in">
+            <div class="text-gray-400 text-8xl mb-6">📝</div>
+            <h3 class="text-2xl font-semibold text-gray-600 mb-4">No posts visible</h3>
+            <p class="text-gray-500 text-lg mb-8">
+                {% if user.is_authenticated %}
+                You don't have any posts yet, or the posts from people you follow are from private accounts that require mutual following.
+                {% else %}
+                Be the first to share something amazing!
+                {% endif %}
+            </p>
+            {% if user.is_authenticated %}
+            <div class="space-y-4">
+                <a href="{% url 'create_post' %}" class="inline-block bg-gradient-to-r from-primary-500 to-primary-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Create First Post
+                </a>
+                <div class="mt-4">
+                    <a href="{% url 'search' %}" class="inline-block bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Find People to Follow
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <a href="{% url 'register' %}" class="inline-block bg-gradient-to-r from-primary-500 to-primary-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                </svg>
+                Join Now
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="mt-12 flex justify-center">
+        <nav class="flex items-center space-x-2 bg-white rounded-xl shadow-lg p-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Previous
+            </a>
+            {% endif %}
+            <span class="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold">
+                {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center">
+                Next
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-16 bg-white rounded-2xl shadow-lg">
+        <h3 class="text-2xl font-semibold text-gray-600 mb-4">Please log in to see posts.</h3>
+        <a href="{% url 'login' %}" class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition">Login</a>
+        <a href="{% url 'register' %}" class="ml-4 bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition">Register</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

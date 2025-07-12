@@ -1,0 +1,54 @@
+{% extends 'Social_media/base.html' %}
+{% block title %}Friend Requests - Social Media{% endblock %}
+{% block content %}
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Follow Requests</h1>
+        <!-- Received Requests -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Received Requests</h2>
+            {% if received_requests %}
+                {% for request in received_requests %}
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                            {{ request.sender.username|first|upper }}
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ request.sender.username }}</h3>
+                            <p class="text-sm text-gray-500">{{ request.request_date|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="{% url 'accept_friend_request' request.id %}" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition">Accept</a>
+                        <a href="{% url 'reject_friend_request' request.id %}" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition">Reject</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-gray-500 text-center py-4">No received friend requests</p>
+            {% endif %}
+        </div>
+        <!-- Sent Requests -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Sent Requests</h2>
+            {% if sent_requests %}
+                {% for request in sent_requests %}
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                            {{ request.receiver.username|first|upper }}
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ request.receiver.username }}</h3>
+                            <p class="text-sm text-gray-500">{{ request.request_date|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded text-sm">Pending</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-gray-500 text-center py-4">No sent friend requests</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %} 

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post - Social Media</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-2xl font-bold text-purple-600">SocialMedia</div>
+                <div class="flex space-x-4">
+                    <a href="{% url 'home' %}" class="text-gray-600 hover:text-gray-800">Home</a>
+                    <a href="{% url 'logout' %}" class="text-gray-600 hover:text-gray-800">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-2xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    ✏️
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Edit Post</h1>
+                    <p class="text-gray-600">Update your post content</p>
+                </div>
+            </div>
+
+            <!-- Current Post Preview -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Current Post</h3>
+                <div class="text-sm text-gray-600">
+                    <p><strong>Author:</strong> {{ post.user.username }}</p>
+                    <p><strong>Posted:</strong> {{ post.post_date|date:"M d, Y H:i" }}</p>
+                    {% if post.content %}
+                    <p><strong>Content:</strong> {{ post.content|truncatewords:20 }}</p>
+                    {% endif %}
+                    {% if post.image_url %}
+                    <p><strong>Image:</strong> <a href="{{ post.image_url }}" target="_blank" class="text-blue-600 hover:underline">{{ post.image_url|truncatechars:50 }}</a></p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Edit Post Form -->
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Content Field -->
+                <div>
+                    <label for="{{ form.content.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Content
+                    </label>
+                    <textarea 
+                        name="{{ form.content.name }}" 
+                        id="{{ form.content.id_for_label }}"
+                        rows="4"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        placeholder="Update your post content..."
+                    >{% if form.content.value %}{{ form.content.value }}{% endif %}</textarea>
+                    {% if form.content.errors %}
+                    <div class="mt-1 text-red-600 text-sm">
+                        {% for error in form.content.errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Image Upload Field -->
+                <div>
+                    <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Upload Image
+                    </label>
+                    {% if post.image %}
+                    <div class="mb-3">
+                        <img src="{{ post.image.url }}" alt="Current post image" class="w-full h-32 object-cover rounded-lg">
+                        <p class="text-sm text-gray-500 mt-1">Current image</p>
+                    </div>
+                    {% endif %}
+                    <div class="flex items-center justify-center w-full">
+                        <label for="{{ form.image.id_for_label }}" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                </svg>
+                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                            <input 
+                                type="file" 
+                                name="{{ form.image.name }}" 
+                                id="{{ form.image.id_for_label }}"
+                                accept="image/*"
+                                class="hidden"
+                            >
+                        </label>
+                    </div>
+                    {% if form.image.errors %}
+                    <div class="mt-1 text-red-600 text-sm">
+                        {% for error in form.image.errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Caption Field -->
+                <div>
+                    <label for="{{ form.post_caption.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Caption
+                    </label>
+                    <textarea 
+                        name="{{ form.post_caption.name }}" 
+                        id="{{ form.post_caption.id_for_label }}"
+                        rows="2"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        placeholder="Update your post caption..."
+                    >{% if form.post_caption.value %}{{ form.post_caption.value }}{% endif %}</textarea>
+                    {% if form.post_caption.errors %}
+                    <div class="mt-1 text-red-600 text-sm">
+                        {% for error in form.post_caption.errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex space-x-4 pt-4">
+                    <button 
+                        type="submit" 
+                        class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Update Post
+                    </button>
+                    <a 
+                        href="{% url 'home' %}" 
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    >
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+            <!-- Preview Section -->
+            <div id="preview" class="mt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Preview</h3>
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div id="preview-content" class="text-gray-800 mb-4"></div>
+                    <img id="preview-image" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg hidden">
+                    <div id="preview-caption" class="text-gray-600 italic"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html> 

@@ -1,0 +1,354 @@
+{% extends 'Social_media/base.html' %}
+
+{% block title %}{{ profile_user.username }}'s Profile - Snapzy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Profile Header -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 animate-fade-in">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center space-y-6 lg:space-y-0 lg:space-x-8">
+            <!-- Profile Avatar -->
+            {% if profile_user.profile.profile_image %}
+            <div class="w-32 h-32 rounded-full overflow-hidden shadow-2xl border-4 border-primary-400">
+                <img src="{{ profile_user.profile.profile_image.url }}" alt="{{ profile_user.username }}'s profile image" class="w-full h-full object-cover">
+            </div>
+            {% else %}
+            <div class="w-32 h-32 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-4xl shadow-2xl">
+                {{ profile_user.username|first|upper }}
+            </div>
+            {% endif %}
+            
+            <!-- Profile Info and Share Button -->
+            <div class="flex-1">
+                <div class="flex items-center space-x-3 mb-3">
+                    <h1 class="text-4xl font-bold text-gray-800">{{ profile_user.username }}</h1>
+                    <!-- Share Profile Button -->
+                    <button onclick="navigator.clipboard.writeText(window.location.href); this.innerText='Copied!'; setTimeout(()=>{this.innerText='Share Profile';}, 1500);" class="ml-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors duration-200 focus:outline-none">
+                        Share Profile
+                    </button>
+                    {% if profile_user.profile.privacy == 'private' %}
+                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        Private
+                    </span>
+                    {% else %}
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                        </svg>
+                        Public
+                    </span>
+                    {% endif %}
+                </div>
+                {% if profile_user.profile.bio %}
+                <p class="text-gray-600 text-lg mb-6 leading-relaxed">{{ profile_user.profile.bio }}</p>
+                {% endif %}
+                
+                <!-- Stats -->
+                <div class="flex items-center space-x-8">
+                    {% if not is_private or user == profile_user or is_following and is_followed_by %}
+                        <a href="{% url 'posts_list' profile_user.username %}" class="text-center hover:scale-105 transition-transform cursor-pointer">
+                            <div class="text-3xl font-bold text-gray-800">{{ posts_count|default:posts.count }}</div>
+                            <div class="text-sm text-gray-600 font-medium">Posts</div>
+                        </a>
+                        <a href="{% url 'following_list' profile_user.username %}" class="text-center hover:scale-105 transition-transform cursor-pointer">
+                            <div class="text-3xl font-bold text-gray-800">{{ following_count }}</div>
+                            <div class="text-sm text-gray-600 font-medium">Following</div>
+                        </a>
+                        <a href="{% url 'followers_list' profile_user.username %}" class="text-center hover:scale-105 transition-transform cursor-pointer">
+                            <div class="text-3xl font-bold text-gray-800">{{ followers_count }}</div>
+                            <div class="text-sm text-gray-600 font-medium">Followers</div>
+                        </a>
+                    {% else %}
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-gray-800">{{ posts_count|default:posts.count }}</div>
+                            <div class="text-sm text-gray-600 font-medium">Posts</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-gray-800">{{ following_count }}</div>
+                            <div class="text-sm text-gray-600 font-medium">Following</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-gray-800">{{ followers_count }}</div>
+                            <div class="text-sm text-gray-600 font-medium">Followers</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            {% if user != profile_user %}
+            <div class="flex flex-col space-y-3">
+                {% if is_following %}
+                <a href="{% url 'follow_user' profile_user.id %}" class="bg-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                    Unfollow
+                </a>
+                {% else %}
+                <a href="{% url 'follow_user' profile_user.id %}" class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                    Follow
+                </a>
+                {% endif %}
+                <a href="{% url 'conversation' profile_user.id %}" class="border-2 border-primary-500 text-primary-600 px-6 py-3 rounded-xl font-semibold hover:bg-primary-50 transition-all duration-200 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    Message
+                    <span class="ml-2 text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">{{ message_count }} messages</span>
+                </a>
+            </div>
+            {% else %}
+            <a href="{% url 'edit_profile' %}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit Profile
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- User's Posts -->
+    <div class="space-y-3">
+        {% if is_private %}
+        <div class="text-center py-16 bg-white rounded-2xl shadow-lg animate-bounce-in">
+            <div class="text-gray-400 text-8xl mb-6">🔒</div>
+            <h3 class="text-2xl font-semibold text-gray-600 mb-4">Private Account</h3>
+            <p class="text-gray-500 text-lg mb-8">
+                This account is private. You need to be mutual followers with {{ profile_user.username }} to see their posts.
+            </p>
+            <div class="space-y-4">
+                {% if not is_following %}
+                <div>
+                    <p class="text-sm text-gray-600 mb-2">Step 1: Follow {{ profile_user.username }}</p>
+                    <a href="{% url 'follow_user' profile_user.id %}" class="inline-block bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        Follow {{ profile_user.username }}
+                    </a>
+                </div>
+                {% elif not is_followed_by %}
+                <div>
+                    <p class="text-sm text-gray-600 mb-2">Step 2: Wait for {{ profile_user.username }} to follow you back</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <p class="text-yellow-800 text-sm">
+                            You're following {{ profile_user.username }}, but they haven't followed you back yet. 
+                            Once they follow you back, you'll be able to see their posts.
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg class="w-8 h-8 mr-3 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+            </svg>
+            Posts
+        </h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {% for post in posts %}
+        <div id="post-{{ post.id }}" class="bg-white rounded-2xl shadow-lg overflow-hidden hover-lift animate-slide-up card-glow" style="animation-delay: {{ forloop.counter0 }}s">
+            <!-- Post Header -->
+            <div class="p-3 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <a href="{% url 'posts_list' post.user.username %}#post-{{ post.id }}" class="flex items-center space-x-4 group" style="text-decoration: none;">
+                            {% if post.user.profile.profile_image %}
+                                <img src="{{ post.user.profile.profile_image.url }}" alt="{{ post.user.username }}'s profile image" class="w-12 h-12 rounded-full object-cover" style="border: 3px solid #a855f7;">
+                            {% else %}
+                                <div class="w-12 h-12 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg" style="border: 3px solid #a855f7;">
+                                    {{ post.user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h3 class="font-semibold text-gray-800 text-lg">{{ post.user.username }}</h3>
+                                <p class="text-sm text-gray-500 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    {{ post.post_date|date:"M d, Y H:i" }}
+                                </p>
+                            </div>
+                        </a>
+                    
+                    {% if user == post.user %}
+                    <div class="flex space-x-2">
+                        <a href="{% url 'update_post' post.id %}" class="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-600 transition-colors duration-200 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            Edit
+                        </a>
+                        <a href="{% url 'delete_post' post.id %}" class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600 transition-colors duration-200 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Post Content -->
+            <div class="p-3 flex-1 flex flex-col justify-between">
+                {% if post.content %}
+                <p class="text-gray-800 text-lg leading-relaxed mb-2">{{ post.content }}</p>
+                {% endif %}
+                {% if post.image %}
+                <div class="mb-2 overflow-hidden rounded-xl flex-shrink-0">
+                    <img src="{{ post.image.url }}" alt="Post image" class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300">
+                </div>
+                {% endif %}
+                {% if post.video %}
+                <div class="mb-2 overflow-hidden rounded-xl flex-shrink-0">
+                    <video controls class="w-full h-48 object-cover">
+                        <source src="{{ post.video.url }}" type="video/mp4">
+                        <source src="{{ post.video.url }}" type="video/mov">
+                        <source src="{{ post.video.url }}" type="video/avi">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                {% endif %}
+                {% if post.post_caption %}
+                <div class="text-gray-600 italic text-sm">{{ post.post_caption }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Post Actions -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-6">
+                        <div class="flex items-center space-x-2">
+                            <a href="{% if request.GET.show_likes == post.id|stringformat:'s' %}#post-{{ post.id }}{% else %}?show_likes={{ post.id }}#post-{{ post.id }}{% endif %}" class="font-medium text-gray-600 hover:text-blue-500 transition-colors duration-200">
+                                {{ post.like_count }} likes
+                            </a>
+                            {% if post.like_count > 0 and request.GET.show_likes == post.id|stringformat:'s' %}
+                                <!-- No user list shown -->
+                            {% endif %}
+                        </div>
+                        <a href="{% if request.GET.show_comments == post.id|stringformat:'s' %}{% if request.GET.show_reply %}?show_reply={{ request.GET.show_reply }}{% endif %}#post-{{ post.id }}{% else %}?show_comments={{ post.id }}{% if request.GET.show_reply %}&show_reply={{ request.GET.show_reply }}{% endif %}#post-{{ post.id }}{% endif %}" class="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors duration-200 group">
+                            <div class="p-2 rounded-full group-hover:bg-blue-50 transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                            </div>
+                            <span class="font-medium">{{ post.comment_count }} comments</span>
+                        </a>
+                        <a href="{% url 'add_comment' post.id %}#post-{{ post.id }}" class="flex items-center space-x-2 text-gray-600 hover:text-green-500 transition-colors duration-200 group">
+                            <div class="p-2 rounded-full group-hover:bg-green-50 transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                            </div>
+                            <span class="font-medium">Add Comment</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Likes Section -->
+            {% if post.like_count > 0 and request.GET.show_likes == post.id|stringformat:'s' %}
+            <div class="px-6 py-4 bg-white border-t border-gray-100">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-sm font-semibold text-gray-700 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        People who liked this post ({{ post.like_count }})
+                    </h4>
+                    <a href="{% url 'profile' profile_user.username %}#post-{{ post.id }}" class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 transition">Hide</a>
+                </div>
+                <div class="space-y-2">
+                    {% for like in post.likes_list %}
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                {{ like.user.username|first|upper }}
+                            </div>
+                            <div>
+                                <span class="font-semibold text-sm text-gray-800">{{ like.user.username }}</span>
+                                {% if like.user.first_name or like.user.last_name %}
+                                <p class="text-xs text-gray-500">{{ like.user.first_name }} {{ like.user.last_name }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <a href="{% url 'profile' like.user.username %}" class="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors duration-200">
+                            View Profile
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            <!-- Comments Section -->
+            {% if post.comments.all and request.GET.show_comments == post.id|stringformat:'s' %}
+            <div class="px-6 py-4 bg-white border-t border-gray-100">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-sm font-semibold text-gray-700 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        Comments ({{ post.comment_count }})
+                    </h4>
+                    <a href="{% url 'profile' profile_user.username %}#post-{{ post.id }}" class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 transition">Hide</a>
+                </div>
+                <div class="space-y-3">
+                    {% for comment in post.comments.all %}
+                    <div class="flex space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                            {{ comment.user.username|first|upper }}
+                        </div>
+                        <div class="flex-1">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-semibold text-sm text-gray-800">{{ comment.user.username }}</span>
+                                    <span class="text-xs text-gray-500">{{ comment.comment_date|date:"M d, Y H:i" }}</span>
+                                </div>
+                                <p class="text-gray-700 text-sm mb-2">{{ comment.comment_text }}</p>
+                                <!-- Comment Actions and Replies can be added here if needed -->
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="text-center py-16 bg-white rounded-2xl shadow-lg animate-bounce-in">
+            <div class="text-gray-400 text-8xl mb-6">📝</div>
+            <h3 class="text-2xl font-semibold text-gray-600 mb-4">No posts yet</h3>
+            <p class="text-gray-500 text-lg mb-8">
+                {% if user == profile_user %}
+                You haven't shared anything yet. Start your journey!
+                {% else %}
+                {{ profile_user.username }} hasn't shared anything yet.
+                {% endif %}
+            </p>
+            {% if user == profile_user %}
+            <a href="{% url 'create_post' %}" class="inline-block bg-gradient-to-r from-primary-500 to-primary-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create First Post
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %} 

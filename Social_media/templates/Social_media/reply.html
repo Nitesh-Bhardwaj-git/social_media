@@ -1,0 +1,26 @@
+<div class="flex space-x-2">
+    {% if reply.user.profile.profile_image %}
+        <img src="{{ reply.user.profile.profile_image.url }}" alt="{{ reply.user.username }}'s profile image" class="w-6 h-6 rounded-full object-cover avatar-ring flex-shrink-0">
+    {% else %}
+        <div class="w-6 h-6 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0 avatar-ring">
+            {{ reply.user.username|first|upper }}
+        </div>
+    {% endif %}
+    <div class="flex-1">
+        <div class="bg-blue-50 rounded-lg p-2">
+            <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-xs text-gray-800">{{ reply.user.username }}</span>
+                <span class="text-xs text-gray-500">{{ reply.reply_date|date:"M d, Y H:i" }}</span>
+            </div>
+            <p class="text-gray-700 text-xs">{{ reply.reply_text }}</p>
+            <div class="flex items-center space-x-2 text-xs mt-1">
+                <button type="button" class="focus:outline-none" onclick="likeReply({{ reply.id }})" id="reply-like-btn-{{ reply.id }}">
+                    <svg id="reply-like-heart-{{ reply.id }}" class="w-4 h-4 inline transition-colors duration-200 {% if reply.is_liked %}text-red-500{% else %}text-gray-400{% endif %}" fill="{% if reply.is_liked %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                </button>
+                <span id="reply-like-count-{{ reply.id }}">{{ reply.like_count }}</span> likes
+            </div>
+        </div>
+    </div>
+</div> 

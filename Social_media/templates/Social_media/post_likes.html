@@ -1,0 +1,106 @@
+{% comment %} {% extends 'Social_media/base.html' %}
+
+{% block title %}Who Liked This Post - Social Media Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Who Liked This Post</h1>
+                <p class="text-gray-600 mt-2">{{ liked_users.count }} people liked this post</p>
+            </div>
+            <a href="{% url 'home' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition">
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <!-- Post Preview -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {{ post.user.username|first|upper }}
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 text-lg">{{ post.user.username }}</h3>
+                    <p class="text-sm text-gray-500">{{ post.post_date|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="p-6">
+            {% if post.content %}
+            <p class="text-gray-800 text-lg leading-relaxed mb-4">{{ post.content }}</p>
+            {% endif %}
+            
+            {% if post.image %}
+            <div class="mb-4 overflow-hidden rounded-xl">
+                <img src="{{ post.image.url }}" alt="Post image" class="w-full h-64 object-cover">
+            </div>
+            {% endif %}
+            
+            {% if post.video %}
+            <div class="mb-4 overflow-hidden rounded-xl">
+                <video controls class="w-full h-64 object-cover">
+                    <source src="{{ post.video.url }}" type="video/mp4">
+                    <source src="{{ post.video.url }}" type="video/mov">
+                    <source src="{{ post.video.url }}" type="video/avi">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            {% endif %}
+            
+            {% if post.post_caption %}
+            <p class="text-gray-600 italic text-sm bg-gray-50 p-3 rounded-lg">{{ post.post_caption }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Liked Users List -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="p-6 border-b border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                <svg class="w-6 h-6 mr-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                People who liked this post
+            </h2>
+        </div>
+        
+        {% if liked_users %}
+        <div class="divide-y divide-gray-100">
+            {% for user in liked_users %}
+            <div class="p-6 hover:bg-gray-50 transition-colors duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        {% if user.profile.profile_image %}
+                            <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s profile image" class="w-12 h-12 rounded-full object-cover avatar-ring">
+                        {% else %}
+                            <div class="w-12 h-12 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg avatar-ring">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">{{ user.username }}</h3>
+                            <p class="text-sm text-gray-500">{{ user.first_name }} {{ user.last_name }}</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'profile' user.username %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200">
+                        View Profile
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-12 text-center">
+            <div class="text-gray-400 text-6xl mb-4">💔</div>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No likes yet</h3>
+            <p class="text-gray-500">Be the first to like this post!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}  {% endcomment %}

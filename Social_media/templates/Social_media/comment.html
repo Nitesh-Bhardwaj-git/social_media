@@ -1,21 +1,21 @@
-<div class="flex space-x-3">
+<div class="flex space-x-3 py-2">
     {% if comment.user.profile.profile_image %}
-        <img src="{{ comment.user.profile.profile_image.url }}" alt="{{ comment.user.username }}'s profile image" class="w-8 h-8 rounded-full object-cover avatar-ring flex-shrink-0">
+        <img src="{{ comment.user.profile.profile_image.url }}" alt="{{ comment.user.username }}'s profile image" class="w-8 h-8 rounded-full object-cover avatar-ring flex-shrink-0 ring-2 ring-offset-2 ring-pink-400">
     {% else %}
-        <div class="w-8 h-8 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 avatar-ring">
+        <div class="w-8 h-8 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 avatar-ring ring-2 ring-offset-2 ring-pink-400">
             {{ comment.user.username|first|upper }}
         </div>
     {% endif %}
     <div class="flex-1">
-        <div class="bg-gray-50 rounded-lg p-3">
-            <div class="flex items-center justify-between mb-1">
+        <div class="bg-white rounded-xl p-3 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 gap-1">
                 <span class="font-semibold text-sm text-gray-800">{{ comment.user.username }}</span>
-                <div class="flex items-center space-x-2">
+                <div class="flex flex-wrap items-center space-x-2 gap-y-1">
                     {% if comment.user != user %}
-                        <a href="{% url 'profile' comment.user.username %}" class="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors duration-200">View Profile</a>
+                        <a href="{% url 'profile' comment.user.username %}" class="text-xs bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white px-2 py-1 rounded font-semibold hover:from-blue-700 hover:to-pink-600 transition">View Profile</a>
                         <form method="post" action="{% if comment.user.is_following %}{% url 'unfollow_user' comment.user.id %}{% else %}{% url 'follow_user' comment.user.id %}{% endif %}" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="ml-2 text-xs px-2 py-1 rounded border transition-colors duration-200 {% if comment.user.is_following %}bg-gray-200 text-gray-700 hover:bg-gray-300{% else %}bg-green-500 text-white hover:bg-green-600{% endif %}">
+                            <button type="submit" class="ml-2 text-xs px-2 py-1 rounded border font-semibold transition-colors duration-200 {% if comment.user.is_following %}bg-gray-200 text-gray-700 hover:bg-gray-300{% else %}bg-gradient-to-r from-green-400 to-green-600 text-white hover:from-green-500 hover:to-green-700{% endif %}">
                                 {% if comment.user.is_following %}Unfollow{% else %}Follow{% endif %}
                             </button>
                         </form>
@@ -23,8 +23,8 @@
                     <span class="text-xs text-gray-500">{{ comment.comment_date|date:"M d, Y H:i" }}</span>
                 </div>
             </div>
-            <p class="text-gray-700 text-sm mb-2">{{ comment.comment_text }}</p>
-            <div class="flex items-center space-x-4 text-xs">
+            <p class="text-gray-700 text-sm mb-2 break-words">{{ comment.comment_text }}</p>
+            <div class="flex flex-wrap items-center space-x-2 text-xs gap-y-1">
                 <button type="button" class="flex items-center space-x-1 px-2 py-1 rounded-lg bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-500 transition-colors duration-200 focus:outline-none" onclick="likeComment({{ comment.id }})" id="comment-like-btn-{{ comment.id }}">
                     <svg id="comment-like-heart-{{ comment.id }}" class="w-4 h-4 inline transition-colors duration-200 {% if comment.is_liked %}text-red-500{% else %}text-gray-400{% endif %}" fill="{% if comment.is_liked %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
@@ -39,10 +39,10 @@
                 </button>
             </div>
             <div id="reply-form-{{ comment.id }}" class="mt-3 hidden">
-                <form onsubmit="submitReply(event, {{ comment.id }}, {{ post.id }})" class="flex space-x-2">
-                    <input type="text" name="reply_text" placeholder="Write a reply..." class="flex-1 px-3 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <button type="submit" class="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors duration-200">Reply</button>
-                    <button type="button" onclick="hideReplyForm({{ comment.id }})" class="px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-400 transition-colors duration-200">Cancel</button>
+                <form onsubmit="submitReply(event, {{ comment.id }}, {{ post.id }})" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <input type="text" name="reply_text" placeholder="Write a reply..." class="flex-1 px-3 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                    <button type="submit" class="px-3 py-1 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-500 text-white text-sm rounded-lg font-semibold hover:from-pink-700 hover:to-blue-600 transition">Reply</button>
+                    <button type="button" onclick="hideReplyForm({{ comment.id }})" class="px-3 py-1 border border-gray-300 text-gray-700 text-sm rounded-lg font-semibold hover:bg-gray-50 transition">Cancel</button>
                 </form>
             </div>
             {% if comment.replies_with_likes %}

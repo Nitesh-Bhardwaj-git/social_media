@@ -130,7 +130,14 @@
                         Snapzy
                     </div>
                 </div>
-
+                <!-- Mobile Nav Toggle -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-toggle" class="text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 p-2">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-6">
                     <a href="{% url 'home' %}" class="text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-1">
@@ -163,11 +170,10 @@
                         </a>
                     {% endif %}
                 </div>
-
                 <!-- User Actions -->
                 <div class="flex items-center space-x-4">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'create_post' %}" class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <a href="{% url 'create_post' %}" class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base">
                             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
@@ -187,7 +193,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
                                 <div class="py-2">
                                     <a href="{% url 'profile' user.username %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors duration-200">
                                         <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,17 +218,44 @@
                             </div>
                         </div>
                     {% else %}
-                        <a href="{% url 'login' %}" class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <a href="{% url 'login' %}" class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base">
                             Login
                         </a>
-                        <a href="{% url 'register' %}" class="border-2 border-primary-500 text-primary-600 px-4 py-2 rounded-xl font-semibold hover:bg-primary-50 transition-all duration-200">
+                        <a href="{% url 'register' %}" class="border-2 border-primary-500 text-primary-600 px-4 py-2 rounded-xl font-semibold hover:bg-primary-50 transition-all duration-200 text-sm sm:text-base">
                             Register
                         </a>
                     {% endif %}
                 </div>
             </div>
+            <!-- Mobile Menu (hidden by default) -->
+            <div id="mobile-menu" class="md:hidden hidden flex-col space-y-2 py-4">
+                <a href="{% url 'home' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Home</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'search' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Search</a>
+                    <a href="{% url 'messages' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Messages{% if message_senders_count > 0 %} <span class="ml-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">{{ message_senders_count }}</span>{% endif %}</a>
+                    <a href="{% url 'friend_requests' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Follow Requests</a>
+                    <a href="{% url 'profile' user.username %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Profile</a>
+                    <a href="{% url 'edit_profile' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Edit Profile</a>
+                    <a href="{% url 'logout' %}" class="block text-red-600 hover:bg-red-50 transition-colors duration-200 py-2">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Login</a>
+                    <a href="{% url 'register' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Register</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
+    <script>
+    // Mobile nav toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggle = document.getElementById('mobile-menu-toggle');
+        var menu = document.getElementById('mobile-menu');
+        if (toggle && menu) {
+            toggle.addEventListener('click', function() {
+                menu.classList.toggle('hidden');
+            });
+        }
+    });
+    </script>
 
     <!-- Messages -->
     {% if messages %}

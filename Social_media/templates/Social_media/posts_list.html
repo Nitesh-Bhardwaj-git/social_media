@@ -3,12 +3,12 @@
 {% block title %}Posts by {{ profile_user.username }}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Posts by {{ profile_user.username }}</h1>
-    <div class="space-y-6">
+<div class="max-w-4xl mx-auto px-2 sm:px-4 md:px-6 py-6 sm:py-8">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-6">Posts by {{ profile_user.username }}</h1>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {% for post in posts %}
-            <div class="bg-white rounded-xl shadow p-6">
-                <div class="flex items-center space-x-4 mb-2">
+            <div class="bg-white rounded-xl shadow p-4 sm:p-6 flex flex-col h-full">
+                <div class="flex items-center space-x-3 sm:space-x-4 mb-2">
                     {% if post.user.profile.profile_image %}
                         <img src="{{ post.user.profile.profile_image.url }}" alt="{{ post.user.username }}'s profile image" class="w-10 h-10 rounded-full object-cover" style="border: 3px solid #a855f7;">
                     {% else %}
@@ -17,22 +17,22 @@
                         </div>
                     {% endif %}
                     <div>
-                        <span class="font-semibold">{{ post.user.username }}</span>
+                        <span class="font-semibold text-sm sm:text-base">{{ post.user.username }}</span>
                         <span class="text-xs text-gray-500 ml-2">{{ post.post_date|date:"M d, Y H:i" }}</span>
                     </div>
                 </div>
-                <div class="mb-2">{{ post.content }}</div>
+                <div class="mb-2 text-sm sm:text-base">{{ post.content }}</div>
                 {% if post.image %}
-                    <img src="{{ post.image.url }}" alt="Post image" class="w-full rounded-lg mb-2">
+                    <img src="{{ post.image.url }}" alt="Post image" class="w-full h-40 sm:h-48 rounded-lg mb-2 object-cover">
                 {% endif %}
                 {% if post.video %}
-                    <video controls class="w-full rounded-lg mb-2">
+                    <video controls class="w-full h-40 sm:h-48 rounded-lg mb-2 object-cover">
                         <source src="{{ post.video.url }}">
                         Your browser does not support the video tag.
                     </video>
                 {% endif %}
                 {% if post.post_caption %}
-                    <div class="text-gray-600 italic text-sm">{{ post.post_caption }}</div>
+                    <div class="text-gray-600 italic text-xs sm:text-sm">{{ post.post_caption }}</div>
                 {% endif %}
             </div>
         {% empty %}

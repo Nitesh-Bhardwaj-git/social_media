@@ -1,44 +1,46 @@
 {% extends 'Social_media/base.html' %}
-{% block title %}Messages - Social Media{% endblock %}
+{% block title %}Messages - Snapzy{% endblock %}
 {% block content %}
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8">Messages</h1>
-        <div class="bg-white rounded-lg shadow-md p-6">
-            {% load custom_filters %}
-            {% if users %}
-                {% for user in users %}
-                <div class="flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0">
-                    <div class="flex items-center space-x-3">
-                        {% if user.profile.profile_image %}
-                            <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s profile image" class="w-10 h-10 rounded-full object-cover">
-                        {% else %}
-                            <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                                {{ user.username|first|upper }}
+    <div class="min-h-screen flex items-center justify-center py-8 sm:py-12 px-2 sm:px-4 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
+        <div class="w-full max-w-4xl space-y-8 animate-fade-in">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8">Messages</h1>
+            <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                {% load custom_filters %}
+                {% if users %}
+                    <div class="space-y-4">
+                    {% for user in users %}
+                    <div class="flex flex-col sm:flex-row items-center justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
+                        <div class="flex items-center space-x-3">
+                            {% if user.profile.profile_image %}
+                                <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s profile image" class="w-10 h-10 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400">
+                            {% else %}
+                                <div class="w-10 h-10 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold ring-2 ring-offset-2 ring-pink-400">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h3 class="font-semibold text-gray-800 text-sm sm:text-base">{{ user.username }}</h3>
+                                {% with unseen=message_counts|get_item:user.id %}
+                                    {% if unseen > 0 %}
+                                        <span class="text-xs text-white bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full px-2 py-1 font-semibold">
+                                            {{ unseen }} new message{% if unseen > 1 %}s{% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
+                                            No new messages
+                                        </span>
+                                    {% endif %}
+                                {% endwith %}
                             </div>
-                        {% endif %}
-                        <div>
-                            <h3 class="font-semibold text-gray-800">{{ user.username }}</h3>
-                            {% with unseen=message_counts|get_item:user.id %}
-                                {% if unseen > 0 %}
-                                    <span class="text-xs text-white bg-red-500 rounded-full px-2 py-1">
-                                        {{ unseen }} new message{% if unseen > 1 %}s{% endif %}
-                                    </span>
-                                {% else %}
-                                    <span class="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
-                                        No new messages
-                                    </span>
-                                {% endif %}
-                            {% endwith %}
                         </div>
+                        <a href="{% url 'conversation' user.id %}" class="mt-2 sm:mt-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-pink-600 transition-all duration-200 text-xs sm:text-sm">View Conversation</a>
                     </div>
-                    <a href="{% url 'conversation' user.id %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
-                        Open Chat
-                    </a>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-gray-500 text-center py-8">No conversations yet</p>
-            {% endif %}
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-gray-500 py-8">No messages yet.</div>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endblock %} 

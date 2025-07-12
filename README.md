@@ -96,4 +96,8 @@ Create a `.env` file or set these in your deployment environment:
 - UI/UX inspired by modern social platforms.
 
 ## License
+<<<<<<< HEAD
 [MIT](LICENSE)
+=======
+[MIT](LICENSE)
+>>>>>>> 852e194 (updated)

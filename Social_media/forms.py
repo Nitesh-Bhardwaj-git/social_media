@@ -23,6 +23,24 @@ class CommentForm(forms.ModelForm):
 
 class ProfileForm(forms.ModelForm):
     username = forms.CharField(max_length=150, required=True, label='Username')
+    bio = forms.CharField(
+        required=False,
+        max_length=200,
+        help_text='Max 200 characters.',
+        widget=forms.Textarea(attrs={
+            'rows': 2,
+            'class': 'w-full rounded-lg border border-gray-300 bg-white text-sm'
+        })
+    )
+    contact_info = forms.CharField(
+        required=False,
+        max_length=100,
+        help_text='Max 100 characters.',
+        widget=forms.Textarea(attrs={
+            'rows': 2,
+            'class': 'w-full rounded-lg border border-gray-300 bg-white text-sm'
+        })
+    )
 
     class Meta:
         model = Profile

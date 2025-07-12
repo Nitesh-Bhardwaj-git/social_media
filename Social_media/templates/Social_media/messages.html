@@ -1,16 +1,16 @@
 {% extends 'Social_media/base.html' %}
 {% block title %}Messages - Snapzy{% endblock %}
 {% block content %}
-    <div class="min-h-screen flex items-center justify-center py-8 sm:py-12 px-2 sm:px-4 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
-        <div class="w-full max-w-4xl space-y-8 animate-fade-in">
+    <div class="px-2 sm:px-4 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 min-h-screen pt-12">
+        <div class="w-full max-w-4xl space-y-8 animate-fade-in mx-auto">
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8">Messages</h1>
             <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                 {% load custom_filters %}
                 {% if users %}
                     <div class="space-y-4">
                     {% for user in users %}
-                    <div class="flex flex-col sm:flex-row items-center justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
-                        <div class="flex items-center space-x-3">
+                    <div class="flex flex-col sm:flex-row items-start justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
+                        <div class="flex items-center gap-3 flex-1">
                             {% if user.profile.profile_image %}
                                 <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s profile image" class="w-10 h-10 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400">
                             {% else %}
@@ -33,7 +33,7 @@
                                 {% endwith %}
                             </div>
                         </div>
-                        <a href="{% url 'conversation' user.id %}" class="mt-2 sm:mt-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-pink-600 transition-all duration-200 text-xs sm:text-sm">View Conversation</a>
+                        <a href="{% url 'conversation' user.id %}" class="sm:ml-auto bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-pink-600 transition-all duration-200 text-xs sm:text-sm mt-2 sm:mt-0 self-start">View Conversation</a>
                     </div>
                     {% endfor %}
                     </div>

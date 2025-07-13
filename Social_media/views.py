@@ -14,6 +14,8 @@ from urllib.parse import urlparse, parse_qs
 from django.http import JsonResponse
 from django.db import models
 from django.template.loader import render_to_string
+from django.contrib.auth import get_user_model
+from django.contrib.admin.views.decorators import staff_member_required
 
 def home(request):
     """Home page - shows all posts from all users"""
@@ -1070,3 +1072,9 @@ def notifications_view(request):
         'friend_posts': latest_friend_posts,
     }
     return render(request, 'Social_media/notifications.html', {'notifications': notifications})
+
+@staff_member_required
+def custom_admin_dashboard(request):
+    User = get_user_model()
+    user_count = User.objects.count()
+    return render(request, 'Social_media/custom_admin_dashboard.html', {'user_count': user_count})

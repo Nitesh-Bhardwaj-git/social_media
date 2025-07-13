@@ -4,3 +4,4 @@ django-crispy-forms
 pillow
 # Add any other dependencies your project uses below 
 moviepy 
+whitenoise 

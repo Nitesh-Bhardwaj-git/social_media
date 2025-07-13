@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'Social_media.views.message_senders_count',
+                'Social_media.views.pending_friend_requests_count_processor',
             ],
         },
     },

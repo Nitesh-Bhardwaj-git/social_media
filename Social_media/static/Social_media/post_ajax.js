@@ -65,6 +65,32 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+function likePost(postId) {
+    fetch(`/like-post/${postId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const heart = document.getElementById(`post-like-heart-${postId}`);
+        const count = document.getElementById(`post-like-count-${postId}`);
+        if (data.liked) {
+            heart.classList.add('text-red-500');
+            heart.classList.remove('text-gray-400');
+            heart.setAttribute('fill', 'currentColor');
+        } else {
+            heart.classList.remove('text-red-500');
+            heart.classList.add('text-gray-400');
+            heart.setAttribute('fill', 'none');
+        }
+        count.textContent = data.like_count;
+    });
+}
+
 function likeComment(commentId) {
     fetch(`/like-comment/${commentId}/`, {
         method: 'POST',

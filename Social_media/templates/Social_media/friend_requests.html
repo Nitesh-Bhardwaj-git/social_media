@@ -12,11 +12,15 @@
                     {% for request in received_requests %}
                     <div class="flex flex-col sm:flex-row items-center justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold ring-2 ring-offset-2 ring-pink-400">
-                                {{ request.from_user.username|first|upper }}
-                            </div>
+                            {% if request.sender.profile.profile_image %}
+                                <img src="{{ request.sender.profile.profile_image.url }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400" alt="{{ request.sender.username }}'s profile image">
+                            {% else %}
+                                <div class="w-10 h-10 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold ring-2 ring-offset-2 ring-pink-400">
+                                    {{ request.sender.username|first|upper }}
+                                </div>
+                            {% endif %}
                             <div>
-                                <h3 class="font-semibold text-gray-800 text-sm sm:text-base">{{ request.from_user.username }}</h3>
+                                <h3 class="font-semibold text-gray-800 text-sm sm:text-base">{{ request.sender.username }}</h3>
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2 sm:mt-0">

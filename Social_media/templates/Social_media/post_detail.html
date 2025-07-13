@@ -1,0 +1,70 @@
+{% extends 'Social_media/base.html' %}
+{% block title %}Post by {{ post.user.username }} - Snapzy{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-2 sm:px-4 md:px-6 py-8">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in">
+        <div class="p-6 border-b border-gray-100 flex items-center space-x-4">
+            {% if post.user.profile.profile_image %}
+                <img src="{{ post.user.profile.profile_image.url }}" alt="{{ post.user.username }}'s profile image" class="w-12 h-12 rounded-full object-cover ring-2 ring-primary-400">
+            {% else %}
+                <div class="w-12 h-12 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg ring-2 ring-primary-400">
+                    {{ post.user.username|first|upper }}
+                </div>
+            {% endif %}
+            <div>
+                <a href="{% url 'profile' post.user.username %}" class="font-semibold text-gray-800 text-lg hover:underline">{{ post.user.username }}</a>
+                <div class="text-xs text-gray-500">{{ post.post_date|date:"M d, Y H:i" }}</div>
+            </div>
+        </div>
+        <div class="p-6">
+            {% if post.content %}
+            <p class="text-gray-800 text-base sm:text-lg leading-relaxed mb-4">{{ post.content }}</p>
+            {% endif %}
+            {% if post.image %}
+            <div class="mb-4 overflow-hidden rounded-xl">
+                <img src="{{ post.image.url }}" alt="Post image" class="w-full h-80 object-cover">
+            </div>
+            {% endif %}
+            {% if post.video %}
+            <div class="mb-4 overflow-hidden rounded-xl">
+                <video controls class="w-full h-80 object-cover">
+                    <source src="{{ post.video.url }}" type="video/mp4">
+                    <source src="{{ post.video.url }}" type="video/mov">
+                    <source src="{{ post.video.url }}" type="video/avi">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            {% endif %}
+            {% if post.post_caption %}
+            <div class="text-gray-600 italic text-xs sm:text-sm bg-gray-50 p-2 sm:p-3 rounded-lg mb-4">{{ post.post_caption }}</div>
+            {% endif %}
+            <div class="flex items-center space-x-6 mb-4">
+                <span class="font-medium text-gray-600">{{ post.like_count }} likes</span>
+                <span class="font-medium text-gray-600">{{ post.comment_count }} comments</span>
+            </div>
+            <!-- Likes List -->
+            {% if post.likes_list %}
+            <div class="mb-4">
+                <h4 class="text-sm font-semibold text-gray-700 mb-2">People who liked this post:</h4>
+                <div class="flex flex-wrap gap-2">
+                    {% for like in post.likes_list %}
+                        <a href="{% url 'profile' like.user.username %}" class="text-xs bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white px-2 py-1 rounded font-semibold hover:from-blue-700 hover:to-pink-600 transition">{{ like.user.username }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            <!-- Comments Section -->
+            {% if post.comments_with_likes %}
+            <div class="mt-6">
+                <h4 class="text-sm font-semibold text-gray-700 mb-2">Comments:</h4>
+                <div class="space-y-3">
+                    {% for comment in post.comments_with_likes %}
+                        {% include 'Social_media/comment.html' with comment=comment post=post %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -167,6 +167,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                             </svg>
                             <span>Follow Requests</span>
+                            {% if pending_friend_requests_count > 0 %}
+                                <span class="ml-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">{{ pending_friend_requests_count }}</span>
+                            {% endif %}
                         </a>
                     {% endif %}
                 </div>
@@ -233,7 +236,7 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'search' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Search</a>
                     <a href="{% url 'messages' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Messages{% if message_senders_count > 0 %} <span class="ml-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">{{ message_senders_count }}</span>{% endif %}</a>
-                    <a href="{% url 'friend_requests' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Follow Requests</a>
+                    <a href="{% url 'friend_requests' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Follow Requests{% if pending_friend_requests_count > 0 %} <span class="ml-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">{{ pending_friend_requests_count }}</span>{% endif %}</a>
                     <a href="{% url 'profile' user.username %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Profile</a>
                     <a href="{% url 'edit_profile' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Edit Profile</a>
                     <a href="{% url 'logout' %}" class="block text-red-600 hover:bg-red-50 transition-colors duration-200 py-2">Logout</a>

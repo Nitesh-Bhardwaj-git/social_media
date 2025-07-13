@@ -68,11 +68,37 @@ def home(request):
         paginator = Paginator(visible_posts, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
+
+        # Add pending friend request count
+        pending_friend_requests_count = FriendRequest.objects.filter(receiver=request.user, status='pending').count()
+
+        # Notifications
+        # 1. Latest likes on user's posts
+        my_posts = Post.objects.filter(user=request.user)
+        latest_likes = Like.objects.filter(post__in=my_posts).order_by('-likes_date')[:5]
+        # 2. Latest comments on user's posts
+        latest_comments = Comment.objects.filter(post__in=my_posts).order_by('-comment_date')[:5]
+        # 3. Pending follow requests
+        latest_follow_requests = FriendRequest.objects.filter(receiver=request.user, status='pending').order_by('-request_date')[:5]
+        # 4. New posts from people I follow
+        following_ids = Follow.objects.filter(follower=request.user).values_list('following', flat=True)
+        latest_friend_posts = Post.objects.filter(user__in=following_ids).exclude(user=request.user).order_by('-post_date')[:5]
+
+        notifications = {
+            'likes': latest_likes,
+            'comments': latest_comments,
+            'follow_requests': latest_follow_requests,
+            'friend_posts': latest_friend_posts,
+        }
     else:
         page_obj = []
+        pending_friend_requests_count = 0
+        notifications = None
     context = {
         'page_obj': page_obj,
         'posts': page_obj,
+        'pending_friend_requests_count': pending_friend_requests_count,
+        'notifications': notifications,
     }
     return render(request, 'Social_media/home.html', context)
 
@@ -138,6 +164,15 @@ def profile_view(request, username):
     if not is_own_profile:
         is_followed_by = Follow.objects.filter(follower=user, following=request.user).exists()
     
+    # Check for pending friend requests
+    has_pending_request = False
+    if not is_own_profile:
+        has_pending_request = FriendRequest.objects.filter(
+            sender=request.user,
+            receiver=user,
+            status='pending'
+        ).exists()
+    
     # Determine if posts should be shown
     show_posts = True
     if is_private and not is_own_profile:
@@ -158,6 +193,7 @@ def profile_view(request, username):
             'posts_count': posts_count,
             'is_following': is_following,
             'is_followed_by': is_followed_by,
+            'has_pending_request': has_pending_request,
             'message_count': 0,  # No messages if not mutual
         }
         return render(request, 'Social_media/profile.html', context)
@@ -202,6 +238,7 @@ def profile_view(request, username):
         'followers_count': followers_count,
         'is_following': is_following,
         'is_followed_by': is_followed_by,
+        'has_pending_request': has_pending_request,
         'is_private': False,
         'message_count': unseen_message_count,
     }
@@ -261,6 +298,13 @@ def like_post(request, post_id):
     if not created:
         # User already liked the post, so unlike it
         like.delete()
+    
+    # AJAX support
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'liked': created,
+            'like_count': post.like_count,
+        })
     
     # Get current URL parameters to maintain state
     show_comments = request.GET.get('show_comments')
@@ -326,7 +370,14 @@ def accept_friend_request(request, request_id):
     friend_request = get_object_or_404(FriendRequest, id=request_id, receiver=request.user)
     friend_request.status = 'accepted'
     friend_request.save()
-    messages.success(request, f'Friend request from {friend_request.sender.username} accepted!')
+    
+    # Create follow relationship when friend request is accepted
+    Follow.objects.get_or_create(
+        follower=friend_request.sender,
+        following=friend_request.receiver
+    )
+    
+    messages.success(request, f'Friend request from {friend_request.sender.username} accepted! You are now following each other.')
     return redirect('friend_requests')
 
 @login_required
@@ -446,6 +497,11 @@ def search_users(request):
         for user in users:
             user.is_following = Follow.objects.filter(follower=request.user, following=user).exists()
             user.is_followed_by = Follow.objects.filter(follower=user, following=request.user).exists()
+            user.has_pending_request = FriendRequest.objects.filter(
+                sender=request.user,
+                receiver=user,
+                status='pending'
+            ).exists()
     
     context = {
         'users': users,
@@ -610,18 +666,61 @@ def follow_user(request, user_id):
         messages.error(request, 'You cannot follow yourself.')
         return redirect('profile', username=user_to_follow.username)
     
+    # Get the profile of the user to follow
+    profile, created = Profile.objects.get_or_create(user=user_to_follow)
+    
     # Check if already following
-    follow_relationship, created = Follow.objects.get_or_create(
+    existing_follow = Follow.objects.filter(
         follower=request.user,
         following=user_to_follow
-    )
+    ).exists()
     
-    if not created:
+    if existing_follow:
         # Already following, so unfollow
-        follow_relationship.delete()
+        Follow.objects.filter(
+            follower=request.user,
+            following=user_to_follow
+        ).delete()
         messages.success(request, f'You unfollowed {user_to_follow.username}.')
     else:
-        messages.success(request, f'You are now following {user_to_follow.username}.')
+        # Check if the user has a private profile
+        if profile.privacy == 'private':
+            # Try to get or create a friend request regardless of status
+            friend_request, created = FriendRequest.objects.get_or_create(
+                sender=request.user,
+                receiver=user_to_follow,
+                defaults={'status': 'pending'}
+            )
+            if not created:
+                if friend_request.status == 'pending':
+                    messages.info(request, f'You already have a pending friend request to {user_to_follow.username}.')
+                elif friend_request.status == 'accepted':
+                    follow_exists = Follow.objects.filter(
+                        follower=request.user,
+                        following=user_to_follow
+                    ).exists()
+                    if follow_exists:
+                        messages.info(request, f'You are already following {user_to_follow.username}.')
+                    else:
+                        # This should not happen unless the database is inconsistent.
+                        # Reset the friend request to pending and allow resending.
+                        friend_request.status = 'pending'
+                        friend_request.save()
+                        messages.success(request, f'Your previous request was not completed. Friend request re-sent to {user_to_follow.username}.')
+                else:
+                    # If previously rejected, allow resending
+                    friend_request.status = 'pending'
+                    friend_request.save()
+                    messages.success(request, f'Friend request re-sent to {user_to_follow.username}.')
+            else:
+                messages.success(request, f'Friend request sent to {user_to_follow.username}. They need to accept your request.')
+        else:
+            # For public profiles, follow directly
+            Follow.objects.create(
+                follower=request.user,
+                following=user_to_follow
+            )
+            messages.success(request, f'You are now following {user_to_follow.username}.')
     
     # Check if user came from search page and redirect back there
     referer = request.META.get('HTTP_REFERER', '')
@@ -732,6 +831,11 @@ def following_list_view(request, username):
         user.is_following = Follow.objects.filter(follower=request.user, following=user).exists()
         user.is_followed_by = Follow.objects.filter(follower=user, following=request.user).exists()
     
+    # Debug: Print the count of following
+    print(f"DEBUG: {profile_user.username} is following {following_list.count()} users")
+    for user in following_list:
+        print(f"DEBUG: Following user: {user.username}")
+    
     context = {
         'profile_user': profile_user,
         'following_list': following_list,
@@ -775,6 +879,11 @@ def followers_list_view(request, username):
     for user in followers_list:
         user.is_following = Follow.objects.filter(follower=request.user, following=user).exists()
         user.is_followed_by = Follow.objects.filter(follower=user, following=request.user).exists()
+    
+    # Debug: Print the count of followers
+    print(f"DEBUG: {profile_user.username} has {followers_list.count()} followers")
+    for user in followers_list:
+        print(f"DEBUG: Follower user: {user.username}")
     
     context = {
         'profile_user': profile_user,
@@ -912,3 +1021,50 @@ def message_senders_count(request):
         count = Message.objects.filter(receiver=request.user, message_seen=False).values('sender').distinct().count()
         return {'message_senders_count': count}
     return {'message_senders_count': 0}
+
+def pending_friend_requests_count_processor(request):
+    if request.user.is_authenticated:
+        return {
+            'pending_friend_requests_count': FriendRequest.objects.filter(receiver=request.user, status='pending').count()
+        }
+    return {'pending_friend_requests_count': 0}
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    # Add like/comment/reply status if user is authenticated
+    if request.user.is_authenticated:
+        post.is_liked = Like.objects.filter(user=request.user, post=post).exists()
+        post.comments_with_likes = []
+        for comment in post.comments.all():
+            comment.is_liked = CommentLike.objects.filter(user=request.user, comment=comment).exists()
+            comment.replies_with_likes = []
+            for reply in comment.replies.all():
+                reply.is_liked = ReplyLike.objects.filter(user=request.user, reply=reply).exists()
+                comment.replies_with_likes.append(reply)
+            post.comments_with_likes.append(comment)
+        post.likes_list = Like.objects.filter(post=post).select_related('user')
+    context = {
+        'post': post,
+    }
+    return render(request, 'Social_media/post_detail.html', context)
+
+@login_required
+def notifications_view(request):
+    # 1. Latest likes on user's posts
+    my_posts = Post.objects.filter(user=request.user)
+    latest_likes = Like.objects.filter(post__in=my_posts).order_by('-likes_date')[:10]
+    # 2. Latest comments on user's posts
+    latest_comments = Comment.objects.filter(post__in=my_posts).order_by('-comment_date')[:10]
+    # 3. Pending follow requests
+    latest_follow_requests = FriendRequest.objects.filter(receiver=request.user, status='pending').order_by('-request_date')[:10]
+    # 4. New posts from people I follow
+    following_ids = Follow.objects.filter(follower=request.user).values_list('following', flat=True)
+    latest_friend_posts = Post.objects.filter(user__in=following_ids).exclude(user=request.user).order_by('-post_date')[:10]
+
+    notifications = {
+        'likes': latest_likes,
+        'comments': latest_comments,
+        'follow_requests': latest_follow_requests,
+        'friend_posts': latest_friend_posts,
+    }
+    return render(request, 'Social_media/notifications.html', {'notifications': notifications})

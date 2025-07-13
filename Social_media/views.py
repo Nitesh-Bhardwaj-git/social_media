@@ -1072,9 +1072,3 @@ def notifications_view(request):
         'friend_posts': latest_friend_posts,
     }
     return render(request, 'Social_media/notifications.html', {'notifications': notifications})
-
-@staff_member_required
-def custom_admin_dashboard(request):
-    User = get_user_model()
-    user_count = User.objects.count()
-    return render(request, 'Social_media/custom_admin_dashboard.html', {'user_count': user_count})

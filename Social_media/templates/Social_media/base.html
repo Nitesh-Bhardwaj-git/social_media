@@ -307,8 +307,8 @@
     </footer>
 
     {% block extra_scripts %}{% endblock %}
-{% load static %}
-<script src="{% static 'Social_media/post_ajax.js' %}"></script>
+    {% load static %}
+    <script src="{% static 'Social_media/post_ajax.js' %}"></script>
 </body>
 <script>
 if ('scrollRestoration' in history) {

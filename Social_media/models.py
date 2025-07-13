@@ -41,6 +41,7 @@ class Post(models.Model):
     content = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     video = models.FileField(upload_to='post_videos/', blank=True, null=True)
+    video_thumbnail = models.ImageField(upload_to='post_videos/thumbnails/', blank=True, null=True)  # New field
     post_caption = models.TextField(blank=True, null=True)
     post_date = models.DateTimeField(auto_now_add=True)
     
@@ -48,7 +49,7 @@ class Post(models.Model):
         ordering = ['-post_date']
     
     def __str__(self):
-        return f"{self.user.username}'s post on {self.post_date.strftime('%Y-%m-%d %H:%M')}"
+        return f"{self.user.username}'s post on {self.post_date.strftime('%Y-%m-%d %H:%M')} (video_thumb: {self.video_thumbnail})"
     
     @property
     def like_count(self):

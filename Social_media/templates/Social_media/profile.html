@@ -122,7 +122,7 @@
                 <a href="{% url 'post_detail' post.id %}"><img src="{{ post.image.url }}" alt="Post image" class="w-full h-40 sm:h-48 rounded-lg mb-2 object-cover hover:scale-105 transition-transform duration-300"></a>
             {% endif %}
             {% if post.video %}
-                <a href="{% url 'post_detail' post.id %}"><video controls class="w-full h-40 sm:h-48 rounded-lg mb-2 object-cover">
+                <a href="{% url 'post_detail' post.id %}"><video controls class="w-full h-40 sm:h-48 rounded-lg mb-2 object-cover" {% if post.video_thumbnail %}poster="{{ post.video_thumbnail.url }}"{% endif %}>
                     <source src="{{ post.video.url }}">
                     Your browser does not support the video tag.
                 </video></a>
@@ -143,6 +143,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
                     Delete
+                </a>
+            </div>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <div class="flex items-center space-x-2 mt-2">
+                <a href="{% url 'add_comment' post.id %}#post-{{ post.id }}" class="flex items-center space-x-2 text-gray-600 hover:text-green-500 transition-colors duration-200 group">
+                    <span class="font-medium">Add Comment</span>
                 </a>
             </div>
             {% endif %}

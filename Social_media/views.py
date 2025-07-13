@@ -7,14 +7,14 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from .models import Profile, Post, Like, Comment, CommentLike, Reply, FriendRequest, Message, Follow, ReplyLike
-from .forms import PostForm, CommentForm, ProfileForm
+from .forms import PostForm, CommentForm, ProfileForm, CustomUserCreationForm
 from django.utils import timezone
 from datetime import timedelta
 from urllib.parse import urlparse, parse_qs
 from django.http import JsonResponse
 from django.db import models
-from django.db.models import Count
 from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 def home(request):
     """Home page - shows all posts from all users"""
@@ -105,7 +105,7 @@ def home(request):
 def register_view(request):
     """User registration view"""
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             # Create profile for new user
@@ -114,7 +114,7 @@ def register_view(request):
             messages.success(request, 'Account created successfully!')
             return redirect('home')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     
     return render(request, 'Social_media/register.html', {'form': form})
 
@@ -130,9 +130,12 @@ def login_view(request):
                 login(request, user)
                 messages.success(request, f'Welcome back, {username}!')
                 return redirect('home')
+            else:
+                messages.error(request, 'The username or password is incorrect.')
+        else:
+            messages.error(request, 'The username or password is incorrect.')
     else:
         form = AuthenticationForm()
-    
     return render(request, 'Social_media/login.html', {'form': form})
 
 @login_required
@@ -992,7 +995,7 @@ def ajax_post_likes(request, post_id):
         for like in likes_list:
             like.user.is_following = Follow.objects.filter(follower=request.user, following=like.user).exists()
             like.user.is_followed_by = Follow.objects.filter(follower=like.user, following=request.user).exists()
-    html = render_to_string('Social_media/partials/likes_list.html', {'post': post, 'likes_list': likes_list})
+    html = render_to_string('Social_media/partials/likes_list.html', {'post': post, 'likes_list': likes_list}, request=request)
     return JsonResponse({'html': html})
 
 @login_required
@@ -1011,7 +1014,7 @@ def ajax_post_comments(request, post_id):
                 reply.user.is_following = Follow.objects.filter(follower=request.user, following=reply.user).exists()
                 reply.user.is_followed_by = Follow.objects.filter(follower=reply.user, following=request.user).exists()
                 comment.replies_with_likes.append(reply)
-    html = render_to_string('Social_media/partials/comments_list.html', {'post': post, 'comments': comments})
+    html = render_to_string('Social_media/partials/comments_list.html', {'post': post, 'comments': comments}, request=request)
     return JsonResponse({'html': html})
 
 def message_senders_count(request):
@@ -1068,3 +1071,10 @@ def notifications_view(request):
         'friend_posts': latest_friend_posts,
     }
     return render(request, 'Social_media/notifications.html', {'notifications': notifications})
+
+def create_admin(request):
+    from django.contrib.auth.models import User
+    if User.objects.filter(username='admin').exists():
+        return HttpResponse('Admin user already exists.')
+    User.objects.create_superuser('admin', 'admin@example.com', 'yourpassword')
+    return HttpResponse('Superuser created!')

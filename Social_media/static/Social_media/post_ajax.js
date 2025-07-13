@@ -5,21 +5,35 @@ function hideAllLists(postId) {
 function loadLikes(postId) {
     hideAllLists(postId);
     fetch(`/ajax/post-likes/${postId}/`)
-        .then(response => response.json())
+        .then(response => {
+            console.log('Likes response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Likes response data:', data);
             const container = document.getElementById('likes-list-' + postId);
             container.innerHTML = data.html + `<div class='mt-2'><button class='text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 transition' onclick='hideAllLists(${postId})'>Hide</button></div>`;
             container.classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Error loading likes:', error);
         });
 }
 function loadComments(postId) {
     hideAllLists(postId);
     fetch(`/ajax/post-comments/${postId}/`)
-        .then(response => response.json())
+        .then(response => {
+            console.log('Comments response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Comments response data:', data);
             const container = document.getElementById('comments-list-' + postId);
             container.innerHTML = data.html + `<div class='mt-2'><button class='text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 transition' onclick='hideAllLists(${postId})'>Hide</button></div>`;
             container.classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Error loading comments:', error);
         });
 }
 function showReplyForm(commentId) {

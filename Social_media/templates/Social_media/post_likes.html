@@ -41,7 +41,7 @@
                 {% endif %}
                 {% if post.video %}
                 <div class="mb-4 overflow-hidden rounded-xl">
-                    <video controls class="w-full h-64 object-cover">
+                    <video controls class="w-full h-64 object-cover" {% if post.video_thumbnail %}poster="{{ post.video_thumbnail.url }}"{% endif %}>
                         <source src="{{ post.video.url }}" type="video/mp4">
                         <source src="{{ post.video.url }}" type="video/mov">
                         <source src="{{ post.video.url }}" type="video/avi">

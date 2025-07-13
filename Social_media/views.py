@@ -14,7 +14,6 @@ from urllib.parse import urlparse, parse_qs
 from django.http import JsonResponse
 from django.db import models
 from django.template.loader import render_to_string
-from django.http import HttpResponse
 
 def home(request):
     """Home page - shows all posts from all users"""
@@ -1071,10 +1070,3 @@ def notifications_view(request):
         'friend_posts': latest_friend_posts,
     }
     return render(request, 'Social_media/notifications.html', {'notifications': notifications})
-
-def create_admin(request):
-    from django.contrib.auth.models import User
-    if User.objects.filter(username='admin').exists():
-        return HttpResponse('Admin user already exists.')
-    User.objects.create_superuser('admin', 'admin@example.com', 'yourpassword')
-    return HttpResponse('Superuser created!')

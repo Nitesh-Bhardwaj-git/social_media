@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
@@ -16,6 +16,23 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import update_session_auth_hash
+from django import forms
+from django.contrib.auth import password_validation
+
+class SimplePasswordChangeForm(PasswordChangeForm):
+    def clean_new_password1(self):
+        password1 = self.cleaned_data.get('new_password1')
+        if len(password1) < 6:
+            raise forms.ValidationError('Password must be at least 6 characters long.')
+        return password1
+    def clean_new_password2(self):
+        password2 = self.cleaned_data.get('new_password2')
+        password1 = self.cleaned_data.get('new_password1')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('The two password fields didn’t match.')
+        # Do NOT call Django's default password validation
+        return password2
 
 def home(request):
     """Home page - shows all posts from all users"""
@@ -539,11 +556,15 @@ def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, user=request.user)
     
     if request.method == 'POST':
+        print("POST received for delete_post")  # DEBUG
         if request.POST.get('confirm_delete'):
+            print(f"Confirmed delete for post: {post.id}")  # DEBUG
             post.delete()
+            print(f"Post {post.id} deleted from DB")  # DEBUG
             messages.success(request, 'Post deleted successfully!')
             return redirect('home')
         else:
+            print("Delete not confirmed (checkbox not checked)")  # DEBUG
             messages.error(request, 'Please confirm the deletion.')
     
     context = {
@@ -1072,3 +1093,26 @@ def notifications_view(request):
         'friend_posts': latest_friend_posts,
     }
     return render(request, 'Social_media/notifications.html', {'notifications': notifications})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = SimplePasswordChangeForm(user=request.user, data=request.POST)
+    else:
+        form = SimplePasswordChangeForm(user=request.user)
+    # Set autocomplete attributes for all password fields
+    form.fields['old_password'].widget.attrs['autocomplete'] = 'current-password'
+    form.fields['new_password1'].widget.attrs['autocomplete'] = 'new-password'
+    form.fields['new_password2'].widget.attrs['autocomplete'] = 'new-password'
+    form.fields['old_password'].widget.attrs['name'] = 'current_pass'
+    form.fields['new_password1'].widget.attrs['name'] = 'new_pass1'
+    form.fields['new_password2'].widget.attrs['name'] = 'new_pass2'
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.save()
+            logout(request)
+            messages.success(request, 'Your password was changed successfully. Please log in with your new password.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    return render(request, 'Social_media/change_password.html', {'form': form})

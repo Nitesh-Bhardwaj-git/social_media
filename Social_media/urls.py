@@ -49,4 +49,5 @@ urlpatterns = [
     path('ajax/post-comments/<int:post_id>/', views.ajax_post_comments, name='ajax_post_comments'),
     path('post/<int:post_id>/', views.post_detail, name='post_detail'),
     path('notifications/', views.notifications_view, name='notifications'),
+    path('change-password/', views.change_password, name='change_password'),
 ] 

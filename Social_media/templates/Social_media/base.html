@@ -182,8 +182,8 @@
                             </svg>
                             Create Post
                         </a>
-                        <div class="relative group">
-                            <button class="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors duration-200">
+                        <div class="relative">
+                            <button id="profile-dropdown-toggle" class="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors duration-200">
                                 {% if user.profile.profile_image %}
                                     <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s profile image" class="w-8 h-8 rounded-full object-cover">
                                 {% else %}
@@ -196,7 +196,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+                            <div id="profile-dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 opacity-0 invisible transition-all duration-200 transform origin-top-right z-50">
                                 <div class="py-2">
                                     <a href="{% url 'profile' user.username %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors duration-200">
                                         <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,13 +210,22 @@
                                         </svg>
                                         Edit Profile
                                     </a>
-                                    <hr class="my-1">
-                                    <a href="{% url 'logout' %}" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition-colors duration-200">
+                                    <a href="{% url 'change_password' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors duration-200">
                                         <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.104.896-2 2-2s2 .896 2 2v1h-4v-1zm-2 1v-1a4 4 0 118 0v1a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3a2 2 0 012-2h2z" />
                                         </svg>
-                                        Logout
+                                        Reset Password
                                     </a>
+                                    <hr class="my-1">
+                                    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition-colors duration-200">
+                                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                            </svg>
+                                            Logout
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -239,7 +248,11 @@
                     <a href="{% url 'friend_requests' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Follow Requests{% if pending_friend_requests_count > 0 %} <span class="ml-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">{{ pending_friend_requests_count }}</span>{% endif %}</a>
                     <a href="{% url 'profile' user.username %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Profile</a>
                     <a href="{% url 'edit_profile' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Edit Profile</a>
-                    <a href="{% url 'logout' %}" class="block text-red-600 hover:bg-red-50 transition-colors duration-200 py-2">Logout</a>
+                    <a href="{% url 'change_password' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Reset Password</a>
+                    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="block text-red-600 hover:bg-red-50 transition-colors duration-200 py-2 w-full text-left" style="background:none;border:none;padding:0;margin:0;cursor:pointer;">Logout</button>
+                    </form>
                 {% else %}
                     <a href="{% url 'login' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Login</a>
                     <a href="{% url 'register' %}" class="block text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 py-2">Register</a>
@@ -255,6 +268,31 @@
         if (toggle && menu) {
             toggle.addEventListener('click', function() {
                 menu.classList.toggle('hidden');
+            });
+        }
+    });
+    // Profile dropdown toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        var profileToggle = document.getElementById('profile-dropdown-toggle');
+        var profileMenu = document.getElementById('profile-dropdown-menu');
+        if (profileToggle && profileMenu) {
+            profileToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var isOpen = profileMenu.classList.contains('opacity-100');
+                if (isOpen) {
+                    profileMenu.classList.remove('opacity-100', 'visible');
+                    profileMenu.classList.add('opacity-0', 'invisible');
+                } else {
+                    profileMenu.classList.remove('opacity-0', 'invisible');
+                    profileMenu.classList.add('opacity-100', 'visible');
+                }
+            });
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileMenu.contains(e.target) && !profileToggle.contains(e.target)) {
+                    profileMenu.classList.remove('opacity-100', 'visible');
+                    profileMenu.classList.add('opacity-0', 'invisible');
+                }
             });
         }
     });

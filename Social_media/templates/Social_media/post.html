@@ -34,7 +34,7 @@
         {% endif %}
         {% if post.image %}
         <div class="mb-2 overflow-hidden rounded-xl flex-shrink-0">
-            <img src="{{ post.image.url }}" alt="Post image" class="w-full h-48 sm:h-80 object-cover hover:scale-105 transition-transform duration-300">
+            <img src="{{ post.image.url }}" alt="Post image" class="w-full h-auto sm:h-80 object-contain sm:object-cover hover:scale-105 transition-transform duration-300">
         </div>
         {% endif %}
         {% if post.video %}

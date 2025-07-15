@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Social_media', '0004_post_video'),
+        ('Social_media', '0003_profile_last_username_change'),
     ]
 
     operations = [

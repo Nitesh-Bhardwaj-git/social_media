@@ -5,7 +5,7 @@ Snapzy is a modern, full-featured social media platform built with Django and Ta
 ## Features
 - Responsive, colorful UI with Tailwind CSS
 - User registration, login, and profile management
-- Create, edit, and delete posts with images and videos
+- Create, edit, and delete posts with images
 - Like and comment on posts (AJAX-powered)
 - Reply to comments, like replies
 - Follow/unfollow users, friend requests, and mutuals
@@ -67,7 +67,7 @@ Create a `.env` file or set these in your deployment environment:
 - **Static files:**
   - Collected to `/static/` for deployment (`python manage.py collectstatic`)
 - **Media files:**
-  - Uploaded images/videos stored in `/media/`
+  - Uploaded images stored in `/media/`
 
 ### Tailwind CSS
 - Uses Tailwind CDN for rapid prototyping.

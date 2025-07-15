@@ -216,6 +216,12 @@
                                         </svg>
                                         Reset Password
                                     </a>
+                                    <a href="#" id="profile-updates-btn" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors duration-200">
+                                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Profile Updates
+                                    </a>
                                     <hr class="my-1">
                                     <form method="post" action="{% url 'logout' %}" style="display:inline;">
                                         {% csrf_token %}
@@ -357,5 +363,44 @@ document.addEventListener("DOMContentLoaded", function() {
         window.scrollTo(0, 0);
     }
 });
+</script>
+<!-- Profile Updates Modal -->
+<div id="profile-updates-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+  <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
+    <button id="close-profile-updates" class="absolute top-2 right-2 text-gray-400 hover:text-primary-600 text-2xl font-bold">&times;</button>
+    <h2 class="text-xl font-bold mb-4 text-primary-700">Profile Updates</h2>
+    {% if profile_updates %}
+      <ul class="space-y-2">
+        <li><span class="font-semibold">Date Created:</span> {{ profile_updates.date_created }} <span class="text-xs text-gray-500">({{ profile_updates.timezone }})</span></li>
+        <li><span class="font-semibold">Date Updated:</span> {{ profile_updates.date_updated }} <span class="text-xs text-gray-500">({{ profile_updates.timezone }})</span></li>
+        <li><span class="font-semibold">Date Active:</span> {{ profile_updates.date_active }} <span class="text-xs text-gray-500">({{ profile_updates.timezone }})</span></li>
+        <li><span class="font-semibold">Last Username Change:</span> {{ profile_updates.last_username_change }} <span class="text-xs text-gray-500">({{ profile_updates.timezone }})</span></li>
+      </ul>
+    {% else %}
+      <p>No profile update information available.</p>
+    {% endif %}
+  </div>
+</div>
+<script>
+// Profile Updates Modal logic
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('profile-updates-btn');
+    var modal = document.getElementById('profile-updates-modal');
+    var closeBtn = document.getElementById('close-profile-updates');
+    if (btn && modal && closeBtn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.classList.remove('hidden');
+      });
+      closeBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+      });
+      window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+          modal.classList.add('hidden');
+        }
+      });
+    }
+  });
 </script>
 </html> 

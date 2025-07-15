@@ -44,17 +44,6 @@
                     {% endif %}
                 </div>
                 <div class="space-y-2">
-                    <label for="{{ form.video.id_for_label }}" class="block text-sm font-semibold text-gray-700">Video</label>
-                    {{ form.video }}
-                    {% if form.video.errors %}
-                    <div class="text-red-600 text-sm flex items-center">
-                        {% for error in form.video.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="space-y-2">
                     <label for="{{ form.post_caption.id_for_label }}" class="block text-sm font-semibold text-gray-700">Caption</label>
                     {{ form.post_caption }}
                     {% if form.post_caption.errors %}

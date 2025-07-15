@@ -6,14 +6,14 @@ from django.utils import timezone
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    bio = models.TextField(blank=True, null=True)
+    bio = models.TextField(max_length = 100, blank=True, null=True)
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     contact_info = models.TextField(blank=True, null=True)
     privacy = models.CharField(max_length=10, choices=[('public', 'Public'), ('private', 'Private')], default='public')
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(default=timezone.now)
     date_active = models.DateTimeField(default=timezone.now)
-    last_username_change = models.DateTimeField(blank=True, null=True)
+    last_username_change = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -28,7 +28,7 @@ class FriendRequest(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_requests')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_requests')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    request_date = models.DateTimeField(auto_now_add=True)
+    request_date = models.DateTimeField(default=timezone.now)
     
     class Meta:
         unique_together = ['sender', 'receiver']
@@ -40,16 +40,14 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     content = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
-    video = models.FileField(upload_to='post_videos/', blank=True, null=True)
-    video_thumbnail = models.ImageField(upload_to='post_videos/thumbnails/', blank=True, null=True)  # New field
     post_caption = models.TextField(blank=True, null=True)
-    post_date = models.DateTimeField(auto_now_add=True)
+    post_date = models.DateTimeField(default=timezone.now)
     
     class Meta:
         ordering = ['-post_date']
     
     def __str__(self):
-        return f"{self.user.username}'s post on {self.post_date.strftime('%Y-%m-%d %H:%M')} (video_thumb: {self.video_thumbnail})"
+        return f"{self.user.username}'s post on {self.post_date.strftime('%Y-%m-%d %H:%M')}"
     
     @property
     def like_count(self):
@@ -62,7 +60,7 @@ class Post(models.Model):
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_likes')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
-    likes_date = models.DateTimeField(auto_now_add=True)
+    likes_date = models.DateTimeField(default=timezone.now)
     
     class Meta:
         unique_together = ['user', 'post']
@@ -74,7 +72,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     comment_text = models.TextField()
-    comment_date = models.DateTimeField(auto_now_add=True)
+    comment_date = models.DateTimeField(default=timezone.now)
     
     class Meta:
         ordering = ['comment_date']
@@ -87,7 +85,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
     message = models.TextField()
     message_seen = models.BooleanField(default=False)
-    sent_date = models.DateTimeField(auto_now_add=True)
+    sent_date = models.DateTimeField(default=timezone.now)
     
     class Meta:
         ordering = ['sent_date']
@@ -97,7 +95,7 @@ class Message(models.Model):
 
 class Reply(models.Model):
     reply_text = models.TextField()
-    reply_date = models.DateTimeField(auto_now_add=True)
+    reply_date = models.DateTimeField(default=timezone.now)
     comment = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name='replies')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_replies')
 
@@ -113,7 +111,7 @@ class Reply(models.Model):
         return self.reply_likes.count()
 
 class CommentLike(models.Model):
-    like_date = models.DateTimeField(auto_now_add=True)
+    like_date = models.DateTimeField(default=timezone.now)
     comment = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name='comment_likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comment_likes')
 
@@ -124,7 +122,7 @@ class CommentLike(models.Model):
         return f"{self.user.username} likes comment {self.comment.id}"
 
 class ReplyLike(models.Model):
-    like_date = models.DateTimeField(auto_now_add=True)
+    like_date = models.DateTimeField(default=timezone.now)
     reply = models.ForeignKey('Reply', on_delete=models.CASCADE, related_name='reply_likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reply_likes')
 
@@ -135,7 +133,7 @@ class ReplyLike(models.Model):
         return f"{self.user.username} likes reply {self.reply.id}"
 
 class Follow(models.Model):
-    follow_date = models.DateTimeField(auto_now_add=True)
+    follow_date = models.DateTimeField(default=timezone.now)
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
     following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')
 

@@ -2,50 +2,21 @@ from django import forms
 from .models import Post, Comment, Profile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+# from moviepy.editor import VideoFileClip
+
 
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['content', 'image', 'video', 'post_caption']
+        fields = ['content', 'image', 'post_caption']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'What\'s on your mind?'}),
             'image': forms.FileInput(attrs={'accept': 'image/*'}),
-            'video': forms.FileInput(attrs={'accept': 'video/*'}),
             'post_caption': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Add a caption...'}),
         }
 
     def save(self, commit=True):
         post = super().save(commit=False)
-        video_file = self.cleaned_data.get('video')
-        if video_file:
-            from moviepy.editor import VideoFileClip
-            from django.core.files.base import ContentFile
-            import os
-            import tempfile
-            # Save the video file temporarily if not already saved
-            if not post.video:
-                post.video = video_file
-                if commit:
-                    post.save()
-            # Generate thumbnail
-            try:
-                with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as temp_video:
-                    for chunk in video_file.chunks():
-                        temp_video.write(chunk)
-                    temp_video.flush()
-                    clip = VideoFileClip(temp_video.name)
-                    frame = clip.get_frame(0)  # Get first frame
-                    import numpy as np
-                    from PIL import Image
-                    import io
-                    image = Image.fromarray(np.uint8(frame))
-                    thumb_io = io.BytesIO()
-                    image.save(thumb_io, format='JPEG')
-                    thumb_file = ContentFile(thumb_io.getvalue(), name=os.path.splitext(video_file.name)[0] + '_thumb.jpg')
-                    post.video_thumbnail = thumb_file
-                    clip.close()
-            except Exception as e:
-                print('Thumbnail generation failed:', e)
         if commit:
             post.save()
         return post

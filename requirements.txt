@@ -2,6 +2,5 @@ Django>=5.2
 gunicorn
 django-crispy-forms
 pillow
-# Add any other dependencies your project uses below 
-moviepy 
+
 whitenoise 

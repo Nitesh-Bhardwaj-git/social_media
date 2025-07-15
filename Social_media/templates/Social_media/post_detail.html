@@ -25,16 +25,6 @@
                 <img src="{{ post.image.url }}" alt="Post image" class="w-full h-80 object-cover">
             </div>
             {% endif %}
-            {% if post.video %}
-            <div class="mb-4 overflow-hidden rounded-xl">
-                <video controls class="w-full h-80 object-cover" {% if post.video_thumbnail %}poster="{{ post.video_thumbnail.url }}"{% endif %}>
-                    <source src="{{ post.video.url }}" type="video/mp4">
-                    <source src="{{ post.video.url }}" type="video/mov">
-                    <source src="{{ post.video.url }}" type="video/avi">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-            {% endif %}
             {% if post.post_caption %}
             <div class="text-gray-600 italic text-xs sm:text-sm bg-gray-50 p-2 sm:p-3 rounded-lg mb-4">{{ post.post_caption }}</div>
             {% endif %}

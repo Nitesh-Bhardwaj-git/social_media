@@ -21,7 +21,14 @@
             <div class="flex-1 min-w-0">
                 <!-- Username and Action Buttons -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-6 mb-4">
-                    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-0">{{ profile_user.username }}</h2>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-0 flex items-center">
+                        {{ profile_user.username }}
+                        {% if profile_user.profile.privacy == 'private' %}
+                            <span class="ml-3 bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-full">Private</span>
+                        {% else %}
+                            <span class="ml-3 bg-green-700 text-white text-xs font-semibold px-3 py-1 rounded-full">Public</span>
+                        {% endif %}
+                    </h2>
                     <div class="flex flex-row gap-2 sm:gap-4">
                         {% if user == profile_user %}
                         <a href="{% url 'edit_profile' %}" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Edit profile</a>

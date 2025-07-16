@@ -1,3 +1,4 @@
+{% load tz %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +19,6 @@
                 <div class="hidden md:flex space-x-4">
                     <a href="{% url 'home' %}" class="text-white hover:text-yellow-200 font-medium">Home</a>
                     <a href="{% url 'messages' %}" class="text-white hover:text-yellow-200 font-medium">Messages</a>
-                    <a href="{% url 'logout' %}" class="text-white hover:text-yellow-200 font-medium">Logout</a>
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden flex items-center">
@@ -33,7 +33,6 @@
             <div id="mobile-menu" class="md:hidden hidden pb-4">
                 <a href="{% url 'home' %}" class="block text-white py-2 px-4 hover:bg-purple-500 rounded">Home</a>
                 <a href="{% url 'messages' %}" class="block text-white py-2 px-4 hover:bg-purple-500 rounded">Messages</a>
-                <a href="{% url 'logout' %}" class="block text-white py-2 px-4 hover:bg-purple-500 rounded">Logout</a>
             </div>
         </div>
     </nav>
@@ -63,7 +62,9 @@
                         {% endif %}">
                         <p>{{ message.message }}</p>
                         <p class="text-xs {% if message.sender == user %}text-purple-200{% else %}text-gray-500{% endif %} mt-1">
-                            {{ message.sent_date|date:"M d, H:i" }}
+                            {% timezone "Asia/Kolkata" %}
+                                {{ message.sent_date|date:"M d, H:i" }}
+                            {% endtimezone %}
                             {% if message.sender == user %}
                                 {% if message.message_seen %}
                                     <span class="ml-2 text-green-300">&#10003; Seen</span>

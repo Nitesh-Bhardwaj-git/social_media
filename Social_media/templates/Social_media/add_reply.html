@@ -1,4 +1,5 @@
 {% extends 'Social_media/base.html' %}
+{% load tz %}
 
 {% block title %}Add Reply - Snapzy{% endblock %}
 
@@ -20,7 +21,9 @@
                     </div>
                     <div>
                         <span class="font-semibold text-gray-800">{{ comment.user.username }}</span>
-                        <span class="text-xs text-gray-500 ml-2">{{ comment.comment_date|date:"M d, Y H:i" }}</span>
+                        {% timezone "Asia/Kolkata" %}
+                            <span class="text-xs text-gray-500 ml-2">{{ comment.comment_date|date:"M d, Y H:i" }}</span>
+                        {% endtimezone %}
                     </div>
                 </div>
                 <p class="text-gray-700">{{ comment.comment_text }}</p>

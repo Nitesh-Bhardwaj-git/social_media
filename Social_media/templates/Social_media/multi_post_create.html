@@ -1,0 +1,14 @@
+{% extends 'Social_media/base.html' %}
+{% block title %}Create Multi-Image Post{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto p-6 bg-white rounded-xl shadow">
+    <h2 class="text-2xl font-bold mb-4">Create a Multi-Image Post</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <label for="id_image">Images:</label>
+        <input type="file" name="image" id="id_image" multiple required>
+        <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Post</button>
+    </form>
+</div>
+{% endblock %} 

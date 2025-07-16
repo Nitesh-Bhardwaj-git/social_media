@@ -1,3 +1,4 @@
+{% load tz %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,7 +61,9 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-gray-800">{{ post.user.username }}</h3>
-                            <p class="text-sm text-gray-500">{{ post.post_date|date:"M d, Y H:i" }}</p>
+                            {% timezone "Asia/Kolkata" %}
+                                <p class="text-sm text-gray-500">{{ post.post_date|date:"M d, Y H:i" }}</p>
+                            {% endtimezone %}
                         </div>
                     </div>
                     {% if post.content %}

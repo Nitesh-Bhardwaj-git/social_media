@@ -1,3 +1,4 @@
+{% load tz %}
 <div id="post-{{ post.id }}" class="bg-white rounded-2xl shadow-lg overflow-hidden hover-lift animate-slide-up card-glow mb-6" style="animation-delay: {{ forloop.counter|add:'-1' }}s">
     <!-- Post Header -->
     <div class="p-4 sm:p-6 border-b border-gray-100">
@@ -18,7 +19,9 @@
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        {{ post.post_date|date:"M d, Y H:i" }}
+                        {% timezone "Asia/Kolkata" %}
+                            {{ post.post_date|date:"M d, Y H:i" }}
+                        {% endtimezone %}
                     </p>
                 </div>
             </div>
@@ -32,13 +35,46 @@
         {% if post.content %}
         <p class="text-gray-800 text-base sm:text-lg leading-relaxed mb-2">{{ post.content }}</p>
         {% endif %}
-        {% if post.image %}
-        <div class="mb-2 overflow-hidden rounded-xl flex-shrink-0">
-            <img src="{{ post.image.url }}" alt="Post image" class="w-full h-auto object-contain hover:scale-105 transition-transform duration-300">
-        </div>
-        {% endif %}
+        {% if post.images.all %}
+<div class="carousel-container">
+    <div class="carousel-slide">
+        {% for img in post.images.all %}
+            <img src="{{ img.image.url }}" class="carousel-image" style="{% if not forloop.first %}display:none;{% endif %}">
+        {% endfor %}
+    </div>
+    <div class="carousel-dots">
+        {% for img in post.images.all %}
+            <span class="dot{% if forloop.first %} active{% endif %}" onclick="showSlide{{ post.id }}({{ forloop.counter0 }})"></span>
+        {% endfor %}
+    </div>
+</div>
+<script>
+(function() {
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('#post-{{ post.id }} .carousel-image');
+    const dots = document.querySelectorAll('#post-{{ post.id }} .dot');
+    window.showSlide{{ post.id }} = function(n) {
+        slides.forEach((img, i) => {
+            img.style.display = (i === n) ? 'block' : 'none';
+            dots[i].classList.toggle('active', i === n);
+        });
+        currentSlide = n;
+    };
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => window.showSlide{{ post.id }}(i));
+    });
+})();
+</script>
+<style>
+.carousel-container { position: relative; }
+.carousel-image { width: 100%; border-radius: 10px; }
+.carousel-dots { text-align: center; margin-top: 8px; }
+.dot { height: 10px; width: 10px; margin: 0 2px; background: #bbb; border-radius: 50%; display: inline-block; cursor: pointer; }
+.dot.active { background: #555; }
+</style>
+{% endif %}
         {% if post.post_caption %}
-        <div class="text-gray-600 italic text-xs sm:text-sm bg-gray-50 p-2 sm:p-3 rounded-lg">{{ post.post_caption }}</div>
+        <div class="text-gray-600 italic text-xs sm:text-sm bg-gray-50 p-2 sm:p-3 rounded-lg"><b>{{ post.post_caption }}</b></div>
         {% endif %}
     </div>
     <!-- Post Actions -->

@@ -50,4 +50,5 @@ urlpatterns = [
     path('post/<int:post_id>/', views.post_detail, name='post_detail'),
     path('notifications/', views.notifications_view, name='notifications'),
     path('change-password/', views.change_password, name='change_password'),
+    path('multi-post/', views.multi_post_create, name='multi_post_create'),
 ] 

@@ -34,7 +34,7 @@
                 </div>
                 <div class="space-y-2">
                     <label for="{{ form.image.id_for_label }}" class="block text-sm font-semibold text-gray-700">Image</label>
-                    {{ form.image }}
+                    <input type="file" name="image" multiple>
                     {% if form.image.errors %}
                     <div class="text-red-600 text-sm flex items-center">
                         {% for error in form.image.errors %}

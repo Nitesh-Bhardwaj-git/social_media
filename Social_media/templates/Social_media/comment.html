@@ -1,3 +1,4 @@
+{% load tz %}
 <div class="flex space-x-3 py-2">
     {% if comment.user.profile.profile_image %}
         <img src="{{ comment.user.profile.profile_image.url }}" alt="{{ comment.user.username }}'s profile image" class="w-8 h-8 rounded-full object-cover avatar-ring flex-shrink-0 ring-2 ring-offset-2 ring-pink-400">
@@ -20,7 +21,9 @@
                             </button>
                         </form>
                     {% endif %}
-                    <span class="text-xs text-gray-500">{{ comment.comment_date|date:"M d, Y H:i" }}</span>
+                    {% timezone "Asia/Kolkata" %}
+                        <span class="text-xs text-gray-500">{{ comment.comment_date|date:"M d, Y H:i" }}</span>
+                    {% endtimezone %}
                 </div>
             </div>
             <p class="text-gray-700 text-sm mb-2 break-words">{{ comment.comment_text }}</p>

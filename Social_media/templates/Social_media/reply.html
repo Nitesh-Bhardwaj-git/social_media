@@ -1,3 +1,4 @@
+{% load tz %}
 <div class="flex space-x-2 py-1">
     {% if reply.user.profile.profile_image %}
         <img src="{{ reply.user.profile.profile_image.url }}" alt="{{ reply.user.username }}'s profile image" class="w-6 h-6 rounded-full object-cover avatar-ring flex-shrink-0 ring-2 ring-offset-2 ring-pink-400">
@@ -10,7 +11,9 @@
         <div class="bg-white rounded-xl p-2 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 gap-1">
                 <span class="font-semibold text-xs text-gray-800">{{ reply.user.username }}</span>
-                <span class="text-xs text-gray-500">{{ reply.reply_date|date:"M d, Y H:i" }}</span>
+                {% timezone "Asia/Kolkata" %}
+                    <span class="text-xs text-gray-500">{{ reply.reply_date|date:"M d, Y H:i" }}</span>
+                {% endtimezone %}
             </div>
             <p class="text-gray-700 text-xs break-words">{{ reply.reply_text }}</p>
             <div class="flex items-center space-x-2 text-xs mt-1">

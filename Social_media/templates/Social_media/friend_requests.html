@@ -1,5 +1,6 @@
 {% extends 'Social_media/base.html' %}
 {% block title %}Friend Requests - Snapzy{% endblock %}
+{% load tz %}
 {% block content %}
     <div class="min-h-screen flex justify-center pt-12 px-2 sm:px-4 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
         <div class="w-full max-w-4xl space-y-8 animate-fade-in">
@@ -10,27 +11,30 @@
                 {% if received_requests %}
                     <div class="space-y-4">
                     {% for request in received_requests %}
-                    <div class="flex items-center justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
+                    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between mb-4">
                         <div class="flex items-center space-x-3">
                             {% if request.sender.profile.profile_image %}
-                                <img src="{{ request.sender.profile.profile_image.url }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400" alt="{{ request.sender.username }}'s profile image">
+                                <img src="{{ request.sender.profile.profile_image.url }}" class="w-12 h-12 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400" alt="{{ request.sender.username }}'s profile image">
                             {% else %}
-                                <div class="w-10 h-10 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold ring-2 ring-offset-2 ring-pink-400">
+                                <div class="w-12 h-12 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg ring-2 ring-offset-2 ring-pink-400">
                                     {{ request.sender.username|first|upper }}
                                 </div>
                             {% endif %}
                             <div>
-                                <h3 class="font-semibold text-gray-800 text-sm sm:text-base">{{ request.sender.username }}</h3>
+                                <h3 class="font-semibold text-gray-800 text-base">{{ request.sender.username }}</h3>
+                                {% timezone "Asia/Kolkata" %}
+                                    <p class="text-xs text-gray-500">{{ request.request_date|date:"M d, Y H:i" }}</p>
+                                {% endtimezone %}
                             </div>
                         </div>
-                        <div class="flex flex-row gap-2 sm:gap-4">
-                            <form method="post" action="{% url 'accept_friend_request' request.id %}">
+                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto mt-4 sm:mt-0">
+                            <form method="post" action="{% url 'accept_friend_request' request.id %}" class="w-full sm:w-auto">
                                 {% csrf_token %}
-                                <button type="submit" class="bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-green-500 hover:to-green-700 transition-all duration-200 text-xs sm:text-sm">Accept</button>
+                                <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-green-500 hover:to-green-700 transition-all duration-200 text-sm">Accept</button>
                             </form>
-                            <form method="post" action="{% url 'reject_friend_request' request.id %}">
+                            <form method="post" action="{% url 'reject_friend_request' request.id %}" class="w-full sm:w-auto">
                                 {% csrf_token %}
-                                <button type="submit" class="bg-gradient-to-r from-pink-500 to-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-pink-600 hover:to-red-700 transition-all duration-200 text-xs sm:text-sm">Reject</button>
+                                <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-pink-600 hover:to-red-700 transition-all duration-200 text-sm">Reject</button>
                             </form>
                         </div>
                     </div>
@@ -46,20 +50,23 @@
                 {% if sent_requests %}
                     <div class="space-y-4">
                     {% for request in sent_requests %}
-                    <div class="flex items-center justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
+                    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between mb-4">
                         <div class="flex items-center space-x-3">
                             {% if request.receiver.profile.profile_image %}
-                                <img src="{{ request.receiver.profile.profile_image.url }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400" alt="{{ request.receiver.username }}'s profile image">
+                                <img src="{{ request.receiver.profile.profile_image.url }}" class="w-12 h-12 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400" alt="{{ request.receiver.username }}'s profile image">
                             {% else %}
-                                <div class="w-10 h-10 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold ring-2 ring-offset-2 ring-pink-400">
+                                <div class="w-12 h-12 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg ring-2 ring-offset-2 ring-pink-400">
                                     {{ request.receiver.username|first|upper }}
                                 </div>
                             {% endif %}
                             <div>
-                                <h3 class="font-semibold text-gray-800 text-sm sm:text-base">{{ request.receiver.username }}</h3>
+                                <h3 class="font-semibold text-gray-800 text-base">{{ request.receiver.username }}</h3>
+                                {% timezone "Asia/Kolkata" %}
+                                    <p class="text-xs text-gray-500">{{ request.request_date|date:"M d, Y H:i" }}</p>
+                                {% endtimezone %}
                             </div>
                         </div>
-                        <span class="text-xs sm:text-sm text-white bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full px-3 py-1 font-semibold">Pending</span>
+                        <span class="mt-4 sm:mt-0 text-xs sm:text-sm text-white bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full px-3 py-1 font-semibold w-full sm:w-auto text-center">Pending</span>
                     </div>
                     {% endfor %}
                     </div>

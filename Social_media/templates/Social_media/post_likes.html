@@ -1,4 +1,5 @@
 {% extends 'Social_media/base.html' %}
+{% load tz %}
 
 {% block title %}Who Liked This Post - Snapzy{% endblock %}
 
@@ -26,7 +27,9 @@
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-800 text-lg">{{ post.user.username }}</h3>
-                        <p class="text-sm text-gray-500">{{ post.post_date|date:"M d, Y H:i" }}</p>
+                        {% timezone "Asia/Kolkata" %}
+                            <p class="text-sm text-gray-500">{{ post.post_date|date:"M d, Y H:i" }}</p>
+                        {% endtimezone %}
                     </div>
                 </div>
             </div>

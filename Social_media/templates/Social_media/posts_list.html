@@ -1,4 +1,5 @@
 {% extends 'Social_media/base.html' %}
+{% load tz %}
 
 {% block title %}Posts by {{ profile_user.username }}{% endblock %}
 
@@ -18,7 +19,9 @@
                     {% endif %}
                     <div>
                         <span class="font-semibold text-sm sm:text-base">{{ post.user.username }}</span>
-                        <span class="text-xs text-gray-500 ml-2">{{ post.post_date|date:"M d, Y H:i" }}</span>
+                        {% timezone "Asia/Kolkata" %}
+                            <span class="text-xs text-gray-500 ml-2">{{ post.post_date|date:"M d, Y H:i" }}</span>
+                        {% endtimezone %}
                     </div>
                 </div>
                 <div class="mb-2 text-sm sm:text-base">{{ post.content }}</div>

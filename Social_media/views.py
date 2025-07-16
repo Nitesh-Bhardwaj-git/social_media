@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
-from .models import Profile, Post, Like, Comment, CommentLike, Reply, FriendRequest, Message, Follow, ReplyLike
+from .models import Profile, Post, Like, Comment, CommentLike, Reply, FriendRequest, Message, Follow, ReplyLike, PostImage
 from .forms import PostForm, CommentForm, ProfileForm, CustomUserCreationForm
 from django.utils import timezone
 from datetime import timedelta
@@ -19,6 +19,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import update_session_auth_hash
 from django import forms
 from django.contrib.auth import password_validation
+from django.core.mail import send_mail
 
 class SimplePasswordChangeForm(PasswordChangeForm):
     def clean_new_password1(self):
@@ -128,6 +129,14 @@ def register_view(request):
             user = form.save()
             # Create profile for new user
             Profile.objects.create(user=user)
+            # Send welcome email
+            send_mail(
+                subject='Welcome to Snapzy!',
+                message=f'Hello {user.username},\n\nYour account has been created successfully on Snapzy.\n\nThank you for joining us!',
+                from_email=None,  # Uses DEFAULT_FROM_EMAIL
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
             login(request, user)
             messages.success(request, 'Account created successfully!')
             return redirect('home')
@@ -296,19 +305,36 @@ def edit_profile(request):
 
 @login_required
 def create_post(request):
-    """Create a new post"""
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
+        files = request.FILES.getlist('image')
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
             post.save()
+            for f in files:
+                PostImage.objects.create(post=post, image=f)
             messages.success(request, 'Post created successfully!')
             return redirect('home')
     else:
         form = PostForm()
-    
     return render(request, 'Social_media/create.html', {'form': form})
+
+@login_required
+def multi_post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        files = request.FILES.getlist('image')
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.save()
+            for f in files:
+                PostImage.objects.create(post=post, image=f)
+            return redirect('home')
+    else:
+        form = PostForm()
+    return render(request, 'Social_media/multi_post_create.html', {'form': form})
 
 @login_required
 def like_post(request, post_id):

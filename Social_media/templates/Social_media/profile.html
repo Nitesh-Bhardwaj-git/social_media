@@ -1,4 +1,5 @@
 {% extends 'Social_media/base.html' %}
+{% load tz %}
 
 {% block title %}{{ profile_user.username }}'s Profile - Snapzy{% endblock %}
 
@@ -85,7 +86,7 @@
                 {% if profile_user.profile.bio %}
                 <div class="bg-gray-900 border border-gray-800 rounded-lg shadow-sm px-4 py-3 mb-2 w-80 max-w-xl break-words">
                     <p class="text-white text-base font-semibold mb-1 break-words">BIO</p>
-                    <p class="text-gray-300 text-sm mb-1 break-words">{{ profile_user.profile.bio }}</p>
+                    <p class="text-gray-300 text-sm mb-1 break-words">{{ profile_user.profile.bio|linebreaksbr }}</p>
                 </div>
                 {% endif %}
                 {% if profile_user.profile.location %}
@@ -103,6 +104,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     <a href="{{ profile_user.profile.website }}" target="_blank" rel="noopener" class="underline hover:text-blue-300">{{ profile_user.profile.website }}</a>
+                </div>
+                {% endif %}
+                {% if profile_user.profile.contact_info %}
+                <div class="flex items-center text-gray-400 text-sm mb-1">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 01-8 0 4 4 0 018 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v2m0 4h.01" />
+                    </svg>
+                    <span>{{ profile_user.profile.contact_info|linebreaksbr }}</span>
                 </div>
                 {% endif %}
             </div>
@@ -123,7 +133,9 @@
                 {% endif %}
                 <div>
                     <span class="font-semibold text-sm sm:text-base">{{ post.user.username }}</span>
-                    <span class="text-xs text-gray-500 ml-2">{{ post.post_date|date:"M d, Y H:i" }}</span>
+                    {% timezone "Asia/Kolkata" %}
+                        <span class="text-xs text-gray-500 ml-2">{{ post.post_date|date:"M d, Y H:i" }}</span>
+                    {% endtimezone %}
                 </div>
             </div>
             <div class="mb-2 text-sm sm:text-base">{{ post.content }}</div>

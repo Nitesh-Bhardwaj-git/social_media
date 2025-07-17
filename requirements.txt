@@ -5,3 +5,4 @@ pillow
 
 whitenoise 
 python-dotenv 
+dj-database-url

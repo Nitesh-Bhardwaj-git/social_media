@@ -4,3 +4,4 @@ django-crispy-forms
 pillow
 
 whitenoise 
+python-dotenv 

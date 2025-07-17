@@ -11,8 +11,8 @@
                 {% if received_requests %}
                     <div class="space-y-4">
                     {% for request in received_requests %}
-                    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between mb-4">
-                        <div class="flex items-center space-x-3">
+                    <div class="flex flex-row items-center justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
+                        <div class="flex items-center gap-3 flex-1">
                             {% if request.sender.profile.profile_image %}
                                 <img src="{{ request.sender.profile.profile_image.url }}" class="w-12 h-12 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400" alt="{{ request.sender.username }}'s profile image">
                             {% else %}
@@ -27,14 +27,14 @@
                                 {% endtimezone %}
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto mt-4 sm:mt-0">
-                            <form method="post" action="{% url 'accept_friend_request' request.id %}" class="w-full sm:w-auto">
+                        <div class="flex flex-row gap-2 items-center ml-auto">
+                            <form method="post" action="{% url 'accept_friend_request' request.id %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-green-500 hover:to-green-700 transition-all duration-200 text-sm">Accept</button>
+                                <button type="submit" class="bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-green-500 hover:to-green-700 transition-all duration-200 text-xs sm:text-sm">Accept</button>
                             </form>
-                            <form method="post" action="{% url 'reject_friend_request' request.id %}" class="w-full sm:w-auto">
+                            <form method="post" action="{% url 'reject_friend_request' request.id %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-pink-600 hover:to-red-700 transition-all duration-200 text-sm">Reject</button>
+                                <button type="submit" class="bg-gradient-to-r from-pink-500 to-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-pink-600 hover:to-red-700 transition-all duration-200 text-xs sm:text-sm">Reject</button>
                             </form>
                         </div>
                     </div>
@@ -50,8 +50,8 @@
                 {% if sent_requests %}
                     <div class="space-y-4">
                     {% for request in sent_requests %}
-                    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between mb-4">
-                        <div class="flex items-center space-x-3">
+                    <div class="flex flex-row items-center justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
+                        <div class="flex items-center gap-3 flex-1">
                             {% if request.receiver.profile.profile_image %}
                                 <img src="{{ request.receiver.profile.profile_image.url }}" class="w-12 h-12 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400" alt="{{ request.receiver.username }}'s profile image">
                             {% else %}
@@ -66,7 +66,7 @@
                                 {% endtimezone %}
                             </div>
                         </div>
-                        <span class="mt-4 sm:mt-0 text-xs sm:text-sm text-white bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full px-3 py-1 font-semibold w-full sm:w-auto text-center">Pending</span>
+                        <span class="text-xs sm:text-sm text-white bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full px-3 py-1 font-semibold w-full sm:w-auto text-center ml-auto">Pending</span>
                     </div>
                     {% endfor %}
                     </div>

@@ -451,24 +451,24 @@ def friend_requests(request):
 @login_required
 def messages_view(request):
     """View messages"""
-    # Get all friends (accepted FriendRequests, both directions)
     user = request.user
-    friends_sent = FriendRequest.objects.filter(sender=user, status='accepted').values_list('receiver', flat=True)
-    friends_received = FriendRequest.objects.filter(receiver=user, status='accepted').values_list('sender', flat=True)
-    friend_ids = set(friends_sent) | set(friends_received)
-    friends = User.objects.filter(id__in=friend_ids).select_related('profile')
-
-    # Calculate unseen message counts for each friend
     from .models import Message
+    # Get all users who have sent or received messages with the current user
+    sent_user_ids = Message.objects.filter(sender=user).values_list('receiver', flat=True)
+    received_user_ids = Message.objects.filter(receiver=user).values_list('sender', flat=True)
+    conversation_user_ids = set(sent_user_ids) | set(received_user_ids)
+    # Exclude self from the list
+    conversation_user_ids.discard(user.id)
+    users = User.objects.filter(id__in=conversation_user_ids).select_related('profile')
+
+    # Calculate unseen message counts for each user
     unseen_message_counts = {}
-    for friend in friends:
-        count = Message.objects.filter(
-            sender=friend, receiver=user, message_seen=False
-        ).count()
-        unseen_message_counts[friend.id] = count
+    for u in users:
+        count = Message.objects.filter(sender=u, receiver=user, message_seen=False).count()
+        unseen_message_counts[u.id] = count
     
     context = {
-        'users': friends,
+        'users': users,
         'message_counts': unseen_message_counts,
     }
     return render(request, 'Social_media/messages.html', context)

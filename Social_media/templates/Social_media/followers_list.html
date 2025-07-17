@@ -8,8 +8,8 @@
                 {% if followers_list %}
                     <div class="space-y-4">
                     {% for user in followers_list %}
-                    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between mb-4">
-                        <div class="flex items-center space-x-3">
+                    <div class="flex flex-row items-center justify-between p-2 sm:p-4 border-b border-gray-200 last:border-b-0 gap-2 sm:gap-0">
+                        <div class="flex items-center gap-3 flex-1">
                             {% if user.profile.profile_image %}
                                 <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s profile image" class="w-12 h-12 rounded-full object-cover ring-2 ring-offset-2 ring-pink-400">
                             {% else %}
@@ -18,27 +18,25 @@
                                 </div>
                             {% endif %}
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-semibold text-gray-800 text-base">{{ user.username }}</h3>
-                                    {% if user.profile.privacy == 'private' %}
-                                        <span class="bg-red-100 text-red-800 text-xs font-medium px-1.5 py-0.5 rounded-full flex items-center">
-                                            <svg class="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            Private
-                                        </span>
-                                    {% else %}
-                                        <span class="bg-green-100 text-green-800 text-xs font-medium px-1.5 py-0.5 rounded-full flex items-center">
-                                            <svg class="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            Public
-                                        </span>
-                                    {% endif %}
-                                </div>
+                                <h3 class="font-semibold text-gray-800 text-base">{{ user.username }}</h3>
+                                {% if user.is_following and user.is_followed_by %}
+                                    <span class="text-xs text-white bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full px-2 py-1 font-semibold">Mutual</span>
+                                {% elif user.is_following %}
+                                    <span class="text-xs text-white bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full px-2 py-1 font-semibold">You follow</span>
+                                {% elif user.is_followed_by %}
+                                    <span class="text-xs text-white bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full px-2 py-1 font-semibold">Follows you</span>
+                                {% endif %}
                             </div>
                         </div>
-                        <a href="{% url 'profile' user.username %}" class="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-pink-600 transition-all duration-200 text-sm w-full sm:w-auto text-center">View Profile</a>
+                        <div class="flex flex-row gap-2 items-center ml-auto">
+                            {% if user.is_followed_by and not user.is_following %}
+                                <form method="post" action="{% url 'follow_user' user.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-pink-600 hover:to-blue-600 transition-all duration-200 text-xs sm:text-sm">Follow Back</button>
+                                </form>
+                            {% endif %}
+                            <a href="{% url 'profile' user.username %}" class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-pink-600 transition-all duration-200 text-xs sm:text-sm">View Profile</a>
+                        </div>
                     </div>
                     {% endfor %}
                     </div>

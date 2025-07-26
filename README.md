@@ -1,103 +1,179 @@
-# Snapzy
+# Snapzy - Social Media Platform
 
-Snapzy is a modern, full-featured social media platform built with Django and Tailwind CSS. It offers a vibrant, mobile-first user experience with features like posts, comments, likes, replies, user profiles, messaging, friend requests, privacy controls, and more.
+A modern, feature-rich social media platform built with Django that allows users to connect, share content, and interact with each other.
 
-## Features
-- Responsive, colorful UI with Tailwind CSS
-- User registration, login, and profile management
-- Create, edit, and delete posts with images
-- Like and comment on posts (AJAX-powered)
-- Reply to comments, like replies
-- Follow/unfollow users, friend requests, and mutuals
-- Privacy controls for profiles and posts
-- Direct messaging and conversation views
-- Search for users and follow/unfollow from results
-- View lists of followers, following, and mutual friends
-- Dynamic likes/comments lists with profile actions
-- Modern navigation, mobile menu, and sticky footer
+## 🌟 Features
 
-## Screenshots
-> Add screenshots of the home, post, profile, and mobile views here.
+### User Management
+- **User Registration & Authentication**: Secure user registration and login system
+- **Profile Management**: Customizable user profiles with bio, profile images, and privacy settings
+- **Password Management**: Change password functionality
+- **Privacy Controls**: Public/private profile settings
 
-## Tech Stack
-- **Backend:** Django 4+
-- **Frontend:** Tailwind CSS (CDN or built)
-- **Database:** SQLite (default, easy to switch to Postgres)
-- **Deployment:** Render (full Django), Netlify (static, for frontend-only)
+### Social Features
+- **Friend System**: Send, accept, and reject friend requests
+- **Follow System**: Follow/unfollow other users
+- **User Search**: Search for users by username
 
-## Getting Started
+### Content Sharing
+- **Posts**: Create, edit, and delete posts with text content
+- **Image Support**: Upload images with posts
+- **Multi-Post Creation**: Create multiple posts at once
+- **Post Feed**: View posts from friends and followed users
 
-### Prerequisites
+### Interaction Features
+- **Likes**: Like posts, comments, and replies
+- **Comments**: Add comments to posts
+- **Replies**: Reply to comments with threaded discussions
+- **Real-time Updates**: AJAX-powered like and comment updates
+
+### Messaging
+- **Direct Messages**: Private messaging between users
+- **Conversation View**: Organized message threads
+- **Message Status**: Track read/unread messages
+
+### Additional Features
+- **Notifications**: Stay updated with user activities
+- **Responsive Design**: Mobile-friendly interface
+- **File Upload**: Support for profile images and post images
+
+## 🛠️ Technology Stack
+
+- **Backend**: Django 5.2+
+- **Database**: PostgreSQL (Neon Database)
+- **File Storage**: Local file system with Pillow for image processing
+- **Frontend**: HTML, CSS, JavaScript with AJAX
+- **Deployment**: Render.com with WhiteNoise for static files
+- **Environment**: Python-dotenv for environment variables
+
+## 📋 Prerequisites
+
 - Python 3.8+
-- pip
+- pip (Python package installer)
+- PostgreSQL database (or SQLite for development)
 
-### Installation
-1. **Clone the repository:**
+## 🚀 Installation
+
+1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
-   cd <project-directory>
+   git clone <repository-url>
+   cd Snapzy
    ```
-2. **Install dependencies:**
+
+2. **Create a virtual environment**
+   ```bash
+   python -m venv venv
+   
+   # On Windows
+   venv\Scripts\activate
+   
+   # On macOS/Linux
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
-3. **Apply migrations:**
+
+4. **Set up environment variables**
+   Create a `.env` file in the root directory:
+   ```env
+   SECRET_KEY=your-secret-key-here
+   DEBUG=True
+   DATABASE_URL=your-database-url
+   ALLOWED_HOSTS=localhost,127.0.0.1
+   ```
+
+5. **Run database migrations**
    ```bash
+   python manage.py makemigrations
    python manage.py migrate
    ```
-4. **Create a superuser (optional):**
+
+6. **Create a superuser (optional)**
    ```bash
    python manage.py createsuperuser
    ```
-5. **Run the development server:**
+
+7. **Run the development server**
    ```bash
    python manage.py runserver
    ```
-6. **Access Snapzy:**
-   Open [http://localhost:8000](http://localhost:8000) in your browser.
 
-### Environment Variables
-Create a `.env` file or set these in your deployment environment:
-- `SECRET_KEY` (Django secret key)
-- `DEBUG` (set to `False` in production)
-- `ALLOWED_HOSTS` (comma-separated, e.g. `snapzy.onrender.com,localhost,127.0.0.1`)
-- `DATABASE_URL` (for production/Postgres)
+8. **Access the application**
+   Open your browser and go to `http://127.0.0.1:8000/`
 
-### Static & Media Files
-- **Static files:**
-  - Collected to `/static/` for deployment (`python manage.py collectstatic`)
-- **Media files:**
-  - Uploaded images stored in `/media/`
 
-### Tailwind CSS
-- Uses Tailwind CDN for rapid prototyping.
-- For production, consider integrating [django-tailwind](https://django-tailwind.readthedocs.io/) or building your own CSS for purging unused styles.
 
-## Deployment
+## 🗄️ Database Models
 
-### Render (Recommended for Full Django)
-- Add your environment variables in the Render dashboard.
-- Set build/start commands:
-  - **Build:** `python manage.py collectstatic --noinput`
-  - **Start:** `gunicorn Social.wsgi`
-- Add your Render domain to `ALLOWED_HOSTS`.
-- Ensure static/media files are served (see Render docs).
+### Core Models
+- **User**: Django's built-in User model
+- **Profile**: Extended user profile with bio, image, and privacy settings
+- **Post**: User posts with content and images
+- **Comment**: Comments on posts
+- **Reply**: Replies to comments
+- **Message**: Direct messages between users
 
-### Netlify (Static Frontend Only)
-- Not recommended for full Django apps (use for static builds only).
-- For full functionality, deploy on Render, Heroku, or similar.
+### Social Models
+- **FriendRequest**: Friend request system
+- **Follow**: Follow/unfollow relationships
+- **Like**: Post, comment, and reply likes
 
-## Customization
-- Update branding, colors, and logos in `base.html` and Tailwind classes.
-- Add new features or templates as needed.
+## 🔧 Configuration
 
-## Credits
-- Built with [Django](https://www.djangoproject.com/) and [Tailwind CSS](https://tailwindcss.com/).
-- UI/UX inspired by modern social platforms.
+### Development Settings
+- Set `DEBUG = True` in settings.py
+- Use SQLite database for local development
+- Configure local media storage
 
-## License
-<<<<<<< HEAD
-[MIT](LICENSE)
-=======
-[MIT](LICENSE)
->>>>>>> 852e194 (updated)
+### Production Settings
+- Set `DEBUG = False`
+- Use PostgreSQL database
+- Configure proper static file serving
+- Set up environment variables for sensitive data
+
+## 🚀 Deployment
+
+### Deploy to Render.com
+
+1. **Connect your repository** to Render
+2. **Create a new Web Service**
+3. **Configure environment variables**:
+   - `SECRET_KEY`
+   - `DATABASE_URL`
+   - `DEBUG=False`
+4. **Set build command**: `pip install -r requirements.txt`
+5. **Set start command**: `gunicorn Social.wsgi:application`
+
+### Environment Variables for Production
+```env
+SECRET_KEY=your-production-secret-key
+DEBUG=False
+DATABASE_URL=your-production-database-url
+ALLOWED_HOSTS=your-domain.com
+```
+
+
+### Authentication
+- `GET/POST /register/` - User registration
+- `GET/POST /login/` - User login
+- `GET /logout/` - User logout
+
+### Profiles
+- `GET /profile/<username>/` - View user profile
+- `GET/POST /edit-profile/` - Edit user profile
+
+### Posts
+- `GET/POST /create-post/` - Create new post
+- `GET/POST /update-post/<id>/` - Update post
+- `GET /delete-post/<id>/` - Delete post
+- `GET /like-post/<id>/` - Like/unlike post
+
+### Social Features
+- `GET /send-friend-request/<id>/` - Send friend request
+- `GET /follow/<id>/` - Follow user
+- `GET /messages/` - View messages
+- `GET /search/` - Search users
+

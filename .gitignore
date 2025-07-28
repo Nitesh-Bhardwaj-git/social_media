@@ -1,0 +1,8 @@
+venv/
+*.log
+.env
+.Ds_Store
+db.sqlite3
+media/
+
+staticfiles/

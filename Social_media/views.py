@@ -1123,81 +1123,22 @@ def notifications_view(request):
 @login_required
 def change_password(request):
     if request.method == 'POST':
-        form = SimplePasswordChangeForm(request.user, request.POST)
+        form = SimplePasswordChangeForm(user=request.user, data=request.POST)
+    else:
+        form = SimplePasswordChangeForm(user=request.user)
+    # Set autocomplete attributes for all password fields
+    form.fields['old_password'].widget.attrs['autocomplete'] = 'current-password'
+    form.fields['new_password1'].widget.attrs['autocomplete'] = 'new-password'
+    form.fields['new_password2'].widget.attrs['autocomplete'] = 'new-password'
+    form.fields['old_password'].widget.attrs['name'] = 'current_pass'
+    form.fields['new_password1'].widget.attrs['name'] = 'new_pass1'
+    form.fields['new_password2'].widget.attrs['name'] = 'new_pass2'
+    if request.method == 'POST':
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('profile', username=request.user.username)
+            logout(request)
+            messages.success(request, 'Your password was changed successfully. Please log in with your new password.')
+            return redirect('login')
         else:
             messages.error(request, 'Please correct the error below.')
-    else:
-        form = SimplePasswordChangeForm(request.user)
-    
     return render(request, 'Social_media/change_password.html', {'form': form})
-
-def create_temp_admin(request):
-    """
-    Temporary admin creation view for deployment
-    Access via: /create-admin/?secret_key=YOUR_SECRET_KEY
-    """
-    # Secret key for security - change this to something secure
-    SECRET_KEY = "snapzy_temp_admin_2024"
-    
-    # Check if secret key is provided and correct
-    provided_key = request.GET.get('secret_key')
-    if provided_key != SECRET_KEY:
-        return render(request, 'Social_media/error.html', {
-            'error_message': 'Invalid or missing secret key. Access denied.'
-        }, status=403)
-    
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
-        
-        # Basic validation
-        if not all([username, email, password1, password2]):
-            messages.error(request, 'All fields are required.')
-            return render(request, 'Social_media/create_temp_admin.html')
-        
-        if password1 != password2:
-            messages.error(request, 'Passwords do not match.')
-            return render(request, 'Social_media/create_temp_admin.html')
-        
-        if len(password1) < 8:
-            messages.error(request, 'Password must be at least 8 characters long.')
-            return render(request, 'Social_media/create_temp_admin.html')
-        
-        # Check if user already exists
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists.')
-            return render(request, 'Social_media/create_temp_admin.html')
-        
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already exists.')
-            return render(request, 'Social_media/create_temp_admin.html')
-        
-        try:
-            # Create superuser
-            user = User.objects.create_superuser(
-                username=username,
-                email=email,
-                password=password1
-            )
-            
-            # Create profile for the user
-            Profile.objects.create(user=user)
-            
-            messages.success(request, f'Admin user "{username}" created successfully! You can now login at /admin/')
-            return render(request, 'Social_media/create_temp_admin.html', {
-                'success': True,
-                'username': username
-            })
-            
-        except Exception as e:
-            messages.error(request, f'Error creating admin user: {str(e)}')
-            return render(request, 'Social_media/create_temp_admin.html')
-    
-    return render(request, 'Social_media/create_temp_admin.html')

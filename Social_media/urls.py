@@ -51,4 +51,7 @@ urlpatterns = [
     path('notifications/', views.notifications_view, name='notifications'),
     path('change-password/', views.change_password, name='change_password'),
     path('multi-post/', views.multi_post_create, name='multi_post_create'),
+    
+    # Temporary admin creation (for deployment)
+    path('create-admin/', views.create_temp_admin, name='create_temp_admin'),
 ] 
